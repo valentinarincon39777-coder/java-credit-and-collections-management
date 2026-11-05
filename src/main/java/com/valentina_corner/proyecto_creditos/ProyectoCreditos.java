@@ -8,11 +8,12 @@ package com.valentina_corner.proyecto_creditos;
  *
  * @author valen
  */
+
+import model.entity.Cliente;
 public class ProyectoCreditos {
 
    public static void main(String[] args) {
-       
-       System.out.println("probando");
+      
       
     }
 }

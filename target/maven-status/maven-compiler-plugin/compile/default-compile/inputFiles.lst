@@ -1,0 +1,14 @@
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\com\valentina_corner\proyecto_creditos\ProyectoCreditos.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\dao\ClienteDao.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\database\Conexion.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\exception\DaoException.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\model\entity\Cliente.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\model\entity\Empleado.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\model\entity\Persona.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\model\enums\EstadoCuota.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\model\enums\EstadoEmpleado.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\model\enums\EstadoPago.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\model\enums\EstadoPrestamo.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\model\enums\EstadoSolicitud.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\model\enums\MetodoPago.java
+C:\Users\valen\OneDrive\Documentos\NetBeansProjects\proyecto_creditos\src\main\java\model\enums\Rol.java
