@@ -9,11 +9,18 @@ package com.valentina_corner.proyecto_creditos;
  * @author valen
  */
 
-import model.entity.Cliente;
+import controller.ControllerGeneral;
+
+
 public class ProyectoCreditos {
 
    public static void main(String[] args) {
+       
       
+       ControllerGeneral controller = new ControllerGeneral();
+        controller.iniciar();
+
+         
       
     }
 }

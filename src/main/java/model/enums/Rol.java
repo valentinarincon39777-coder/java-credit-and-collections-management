@@ -9,6 +9,6 @@ package model.enums;
  * @author valen
  */
 public enum Rol {
-    administrador, asesor, analista, cajero
+    administrador_general, asesor_creditos, analista_creditos, gestor_cobros
     
 }

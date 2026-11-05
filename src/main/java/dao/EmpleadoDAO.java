@@ -25,7 +25,7 @@ public class EmpleadoDAO {
 
     //ENCONTRAR EMPLEADO POR SU DOCUMENTO***************************
     public Empleado buscarPorDocumento(String documento) throws DAOException {
-        String sql = "select p.id, p.nombre, p.documento, p.correo, p.telefono, p.direccion "
+        String sql = "select p.id, p.nombre, p.documento, p.correo, p.telefono, p.direccion, "
                 + "e.rol, e.estado "
                 + "from persona p join empleado e on p.id=e.id "
                 + "where p.documento=?";

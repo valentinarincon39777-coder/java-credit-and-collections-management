@@ -23,7 +23,7 @@ public class ClienteDAO {
     //ENCONTRAR CLIENTE POR SU DOCUEMNTO****************************
     
     public Cliente buscarPorDocumento(String documento) throws DAOException {
-        String sql = "select p.id, p.nombre, p.documento, p.correo, p.telefono, p.direccion "
+        String sql = "select p.id, p.nombre, p.documento, p.correo, p.telefono, p.direccion, "
                 + "c.salario_formal, c.puntos_positivos, c.puntos_negativos "
                 + "from persona p join cliente c on p.id=c.id "
                 + "where p.documento=? ";
