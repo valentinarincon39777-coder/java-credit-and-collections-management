@@ -8,7 +8,9 @@ package exception;
  *
  * @author valen
  */
-/*Es la que va a lanzar el DAO cuando falle algo con la base de datos, en vez de imprimir y devolver null*/
+/*Es la que va a lanzar el DAO cuando falle algo con la base de datos, en vez de imprimir y devolver null
+Una excepcion personalizada
+*/
 
 public class DAOException extends Exception {
     
