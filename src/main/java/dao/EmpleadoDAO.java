@@ -22,6 +22,10 @@ import model.entity.Empleado;
 import model.enums.EstadoEmpleado;
 import model.enums.Rol;
 
+
+import java.util.List;
+import java.util.ArrayList;
+
 public class EmpleadoDAO {
 
     //ENCONTRAR EMPLEADO POR SU DOCUMENTO***************************
@@ -141,7 +145,7 @@ public class EmpleadoDAO {
         }
     }
 
-    //VERIFICAR SI EL COCUMENTO YA EXISTE EN PERSONA
+    //VERIFICAR SI EL COCUMENTO YA EXISTE EN PERSONA****************************************************
     public boolean existeDocumento(String documento) throws DAOException {
         String sql = "select id from persona where documento=?";
 
@@ -161,6 +165,180 @@ public class EmpleadoDAO {
         }
 
     }
+    
+    
+    
+    
+    // CONVERTIR RESULTSET EN EMPLEADO******************************************************++
+    private Empleado construirEmpleado(ResultSet rs)
+            throws SQLException {
+
+        return new Empleado(
+                rs.getInt("id"),
+                rs.getString("nombre"),
+                rs.getString("documento"),
+                rs.getString("correo"),
+                rs.getString("telefono"),
+                rs.getString("direccion"),
+                Rol.valueOf(rs.getString("rol")),
+                EstadoEmpleado.valueOf(rs.getString("estado"))
+        );
+    }
+
+    // CONSULTAR TODOS LOS EMPLEADOS*************************************
+    public List<Empleado> listarEmpleados()
+            throws DAOException {
+
+        String sql = "SELECT p.*, e.rol, e.estado "
+                + "FROM persona p "
+                + "JOIN empleado e ON p.id = e.id "
+                + "ORDER BY p.nombre";
+
+        List<Empleado> empleados = new ArrayList<>();
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+                empleados.add(construirEmpleado(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudieron consultar los empleados.", e);
+        }
+
+        return empleados;
+    }
+
+    // BUSCAR EMPLEADO POR ID ***************************************************
+    public Empleado buscarPorId(int id)
+            throws DAOException {
+
+        String sql = "SELECT p.*, e.rol, e.estado "
+                + "FROM persona p "
+                + "JOIN empleado e ON p.id = e.id "
+                + "WHERE p.id = ?";
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    return construirEmpleado(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudo buscar el empleado.", e);
+        }
+
+        return null;
+    }
+
+    // ACTUALIZAR DATOS PERSONALES************************************++
+    public boolean actualizarDatoPersonal(
+            int id, int campo, String valor)
+            throws DAOException {
+
+        String columna;
+
+        switch (campo) {
+            case 1:
+                columna = "nombre";
+                break;
+            case 2:
+                columna = "documento";
+                break;
+            case 3:
+                columna = "correo";
+                break;
+            case 4:
+                columna = "telefono";
+                break;
+            case 5:
+                columna = "direccion";
+                break;
+            default:
+                return false;
+        }
+
+        String sql = "UPDATE persona SET "
+                + columna + " = ? WHERE id = ?";
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, valor);
+            ps.setInt(2, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudieron actualizar los datos.", e);
+        }
+    }
+
+    // ACTUALIZAR ROL DEL EMPLEADO**************************************
+    public boolean actualizarRol(int id, Rol rol)
+            throws DAOException {
+
+        String sql = "UPDATE empleado "
+                + "SET rol = ? WHERE id = ?";
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, rol.name());
+            ps.setInt(2, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudo actualizar el rol.", e);
+        }
+    }
+
+    // DESACTIVAR EMPLEADO**************************************
+    public boolean desactivarEmpleado(int id)
+            throws DAOException {
+
+        String sql = "UPDATE empleado "
+                + "SET estado = 'inactivo' "
+                + "WHERE id = ? AND estado = 'activo'";
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudo desactivar el empleado.", e);
+        }
+    }
+
+    
+    
     
     
     
