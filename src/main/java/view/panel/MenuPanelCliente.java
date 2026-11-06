@@ -32,7 +32,7 @@ public class MenuPanelCliente {
                 4. Consultar pagos
                 5. Realizar pago
                 6. Consultar prestamos
-                7. Actualizar mis datos
+                7. Información para actualizar datos
                 0. Cerrar sesion
 
                 """);

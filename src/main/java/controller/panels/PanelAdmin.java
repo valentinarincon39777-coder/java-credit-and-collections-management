@@ -39,7 +39,7 @@ public class PanelAdmin {
 
                 case 3:
                     mensajes.informativo(
-                            "Consultar perfil financiero: funcionalidad en desarrollo."
+                            "Consultar perfil financiero: funcionalidad inactiva por el momento"
                     );
                     break;
 

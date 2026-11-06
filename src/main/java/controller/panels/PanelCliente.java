@@ -65,7 +65,8 @@ public class PanelCliente {
 
                 case 7:
                     mensajes.informativo(
-                            "Actualizar mis datos: funcionalidad en desarrollo."
+                            "Por favor, comuníquese con un asesor para"
+                            + " la actualización de sus datos. Gracias"
                     );
                     break;
 

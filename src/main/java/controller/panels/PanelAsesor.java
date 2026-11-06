@@ -27,9 +27,8 @@ public class PanelAsesor {
             opcion = menu.mostrarMenu();
 
             switch (opcion) {
-
                 case 1:
-                    controllerCliente.registrarCliente();
+                    controllerCliente.gestionarClientes();
                     break;
 
                 case 2:

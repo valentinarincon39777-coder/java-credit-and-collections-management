@@ -2,6 +2,7 @@ package dao;
 
 import database.Conexion;
 import exception.DAOException;
+import java.math.BigDecimal;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,6 +11,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import model.entity.Cliente;
+
+import java.util.List;
+import java.util.ArrayList;
 
 public class ClienteDAO {
 
@@ -135,20 +139,15 @@ public class ClienteDAO {
                     "Error de conexion o transaccion.", e);
         }
     }
-    
-    
-    
-    
-    // VERIFICAR SI EL DOCUMENTO YA EXISTE EN PERSONA
+
+    // VERIFICAR SI EL DOCUMENTO YA EXISTE EN PERSONA**************************
     public boolean existeDocumento(String documento)
             throws DAOException {
 
         String sql = "SELECT id FROM persona WHERE documento = ?";
 
         try (
-            Connection con = Conexion.conectar();
-            PreparedStatement ps = con.prepareStatement(sql)
-        ) {
+                Connection con = Conexion.conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, documento);
 
@@ -160,24 +159,311 @@ public class ClienteDAO {
             throw new DAOException(
                     "Error al verificar el documento.", e);
         }
+
+    }
+
+    // CONSULTAR TODOS LOS CLIENTES*************************
+    public List<Cliente> listarClientes() throws DAOException {
+
+        String sql = "SELECT p.*, c.salario_formal, "
+                + "c.puntos_positivos, c.puntos_negativos "
+                + "FROM persona p "
+                + "JOIN cliente c ON p.id = c.id "
+                + "ORDER BY p.nombre";
+
+        List<Cliente> clientes = new ArrayList<>();
+
+        try (
+                Connection con = Conexion.conectar(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                clientes.add(construirCliente(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No fue posible consultar los clientes.", e);
+        }
+
+        return clientes;
+    }
+
+    // BUSCAR CLIENTES POR NOMBRE*****************************
+    public List<Cliente> buscarPorNombre(String nombre)
+            throws DAOException {
+
+        String sql = "SELECT p.*, c.salario_formal, "
+                + "c.puntos_positivos, c.puntos_negativos "
+                + "FROM persona p "
+                + "JOIN cliente c ON p.id = c.id "
+                + "WHERE p.nombre LIKE ? "
+                + "ORDER BY p.nombre";
+
+        List<Cliente> clientes = new ArrayList<>();
+
+        try (
+                Connection con = Conexion.conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + nombre + "%");
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    clientes.add(construirCliente(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No fue posible buscar por nombre.", e);
+        }
+
+        return clientes;
+    }
+
+    // ORDENAR CLIENTES SEGUN SUS PUNTOS*************************
+    public List<Cliente> listarPorPuntos(boolean positivos)
+            throws DAOException {
+
+        String columna = positivos
+                ? "c.puntos_positivos"
+                : "c.puntos_negativos";
+
+        String sql = "SELECT p.*, c.salario_formal, "
+                + "c.puntos_positivos, c.puntos_negativos "
+                + "FROM persona p "
+                + "JOIN cliente c ON p.id = c.id "
+                + "ORDER BY " + columna + " DESC, p.nombre";
+
+        List<Cliente> clientes = new ArrayList<>();
+
+        try (
+                Connection con = Conexion.conectar(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                clientes.add(construirCliente(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No fue posible ordenar los clientes.", e);
+        }
+
+        return clientes;
+    }
+
+    // CONVERTIR UNA FILA SQL EN UN OBJETO CLIENTE****************************
+    private Cliente construirCliente(ResultSet rs)
+            throws SQLException {
+
+        return new Cliente(
+                rs.getInt("id"),
+                rs.getString("nombre"),
+                rs.getString("documento"),
+                rs.getString("correo"),
+                rs.getString("telefono"),
+                rs.getString("direccion"),
+                rs.getBigDecimal("salario_formal"),
+                rs.getInt("puntos_positivos"),
+                rs.getInt("puntos_negativos")
+        );
+    }
+    
+    
+    // ACTUALIZAR DATOS PERSONALES********************************************
+    public boolean actualizarDatoPersonal(
+            int id, int campo, String valor)
+            throws DAOException {
+
+        String columna;
+
+        switch (campo) {
+            case 1:
+                columna = "nombre";
+                break;
+            case 2:
+                columna = "documento";
+                break;
+            case 3:
+                columna = "correo";
+                break;
+            case 4:
+                columna = "telefono";
+                break;
+            case 5:
+                columna = "direccion";
+                break;
+            default:
+                return false;
+        }
+
+        String sql = "UPDATE persona SET "
+                + columna + " = ? WHERE id = ?";
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, valor);
+            ps.setInt(2, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudo actualizar el dato.", e);
+        }
     }
 
     
     
     
     
+    // ACTUALIZAR SALARIO FORMAL*****************************************************
+    public boolean actualizarSalario(
+            int id, BigDecimal salario)
+            throws DAOException {
+
+        String sql = "UPDATE cliente "
+                + "SET salario_formal = ? WHERE id = ?";
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setBigDecimal(1, salario);
+            ps.setInt(2, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudo actualizar el salario.", e);
+        }
+    }
+
+    
+    
+    // OBTENER DOCUMENTO ACTUAL POR ID (por si se actualizó el documento en en metodo actualizarCliente )****************************************
+    public String buscarDocumentoPorId(int id)
+            throws DAOException {
+
+        String sql = "SELECT documento FROM persona WHERE id = ?";
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    return rs.getString("documento");
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudo consultar el documento.", e);
+        }
+
+        return null;
+    }
     
     
     
+    // ELIMINAR CLIENTE (solo si no tiene solicitudes)***************************************
+    public boolean eliminarCliente(int id) throws DAOException {
+
+        String sqlBuscar =
+                "SELECT id FROM cliente WHERE id = ? FOR UPDATE"; 
+
+        String sqlVerificar =
+                "SELECT id FROM solicitud_prestamo "
+                + "WHERE cliente_fk = ? ";
+
+        String sqlCliente =
+                "DELETE FROM cliente WHERE id = ?";
+
+        String sqlPersona =
+                "DELETE FROM persona WHERE id = ?";
+
+        try (Connection con = Conexion.conectar()) {
+
+            con.setAutoCommit(false);
+
+            try {
+
+                
+                try (PreparedStatement ps =
+                        con.prepareStatement(sqlBuscar)) {
+
+                    ps.setInt(1, id);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (!rs.next()) {
+                            con.rollback();
+                            return false;
+                        }
+                    }
+                }
+
+              
+                try (PreparedStatement ps =
+                        con.prepareStatement(sqlVerificar)) {
+
+                    ps.setInt(1, id);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            con.rollback();
+                            return false;
+                        }
+                    }
+                }
+
+           
+                try (PreparedStatement ps =
+                        con.prepareStatement(sqlCliente)) {
+
+                    ps.setInt(1, id);
+                    ps.executeUpdate();
+                }
+
+              
+                try (PreparedStatement ps =
+                        con.prepareStatement(sqlPersona)) {
+
+                    ps.setInt(1, id);
+                    ps.executeUpdate();
+                }
+
+               
+                con.commit();
+                return true;
+
+            } catch (SQLException e) {
+
+                try {
+                    con.rollback();
+                } catch (SQLException rollbackError) {
+                    e.addSuppressed(rollbackError);
+                }
+
+                throw new DAOException(
+                        "No se pudo eliminar el cliente.", e);
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "Error de base de datos al eliminar.", e);
+        }
+    }
+
+
     
-    
-    
-    
-    
+
 }
-
-
-
-
-
-
