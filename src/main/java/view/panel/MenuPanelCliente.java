@@ -8,6 +8,39 @@ package view.panel;
  *
  * @author valen
  */
+import java.util.Scanner;
+import utils.Validacion;
 public class MenuPanelCliente {
+    
+       private final Validacion validacion;
+
+    public MenuPanelCliente(Scanner entrada) {
+        this.validacion = new Validacion(entrada);
+    }
+
+    public int mostrarMenu() {
+
+        System.out.println("""
+                           
+                =================================
+                       PANEL DEL CLIENTE
+                =================================
+
+                1. Solicitar prestamo
+                2. Consultar solicitudes
+                3. Consultar cuotas
+                4. Consultar pagos
+                5. Realizar pago
+                6. Consultar prestamos
+                7. Actualizar mis datos
+                0. Cerrar sesion
+
+                """);
+
+        return validacion.validarEnteroRango(
+                "Seleccione una opcion: ", 0, 7
+        );
+    }
+    
     
 }

@@ -37,6 +37,7 @@ public class ControllerGeneral {
     private final EmpleadoDAO empleadoDAO;
 
     public ControllerGeneral() {
+        //solo instanciamos un scanner
         entrada = new Scanner(System.in);
         menu = new MenuGeneral(entrada);
         clienteDAO = new ClienteDAO();
