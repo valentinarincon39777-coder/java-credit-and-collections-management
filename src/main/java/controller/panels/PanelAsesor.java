@@ -1,4 +1,3 @@
-
 package controller.panels;
 
 import java.util.Scanner;
@@ -6,14 +5,18 @@ import model.entity.Empleado;
 import view.panel.MenuPanelAsesor;
 import view.Mensajes;
 
+import controller.ControllerCliente;
+
 public class PanelAsesor {
 
     private final MenuPanelAsesor menu;
     private final Mensajes mensajes;
+    private final ControllerCliente controllerCliente;
 
     public PanelAsesor(Scanner entrada) {
         menu = new MenuPanelAsesor(entrada);
         mensajes = new Mensajes();
+        controllerCliente = new ControllerCliente(entrada);
     }
 
     public void iniciar(Empleado empleado) {
@@ -26,9 +29,7 @@ public class PanelAsesor {
             switch (opcion) {
 
                 case 1:
-                    mensajes.informativo(
-                            "Gestionar clientes: funcionalidad en desarrollo."
-                    );
+                    controllerCliente.registrarCliente();
                     break;
 
                 case 2:
