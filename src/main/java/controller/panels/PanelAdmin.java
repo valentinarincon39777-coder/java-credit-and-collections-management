@@ -5,15 +5,19 @@ import java.util.Scanner;
 import model.entity.Empleado;
 import view.panel.MenuPanelAdmin;
 import view.Mensajes;
+import controller.ControllerEmpleado;
 
 public class PanelAdmin {
 
     private final MenuPanelAdmin menu;
     private final Mensajes mensajes;
+    private final ControllerEmpleado controllerEmpleado; 
+    
 
     public PanelAdmin(Scanner entrada) {
         menu = new MenuPanelAdmin(entrada);
         mensajes = new Mensajes();
+        controllerEmpleado=new ControllerEmpleado(entrada);
     }
 
     public void iniciar(Empleado empleado) {
@@ -26,9 +30,7 @@ public class PanelAdmin {
             switch (opcion) {
 
                 case 1:
-                    mensajes.informativo(
-                            "Gestionar empleados: funcionalidad en desarrollo."
-                    );
+                    controllerEmpleado.registrarEmpleado();
                     break;
 
                 case 2:

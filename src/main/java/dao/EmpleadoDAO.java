@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import model.entity.Empleado;
 
@@ -48,13 +49,131 @@ public class EmpleadoDAO {
                             EstadoEmpleado.valueOf(rs.getString("estado"))
                     );
 
-                }}
+                }
+            }
+
+        } catch (SQLException e) {
+
+            throw new DAOException("Error al buscar el empleado \n", e);
+        }
+
+        return null;
+
+    }
+    
+    
+    
+    
+    
+
+    //REGISTRAR EMPLEADO****************************
+    public void registrarEmpleado(Empleado empleado)
+            throws DAOException {
+
+        String sqlPersona = "insert into persona "
+                + "(nombre, documento, correo, telefono, direccion)"
+                + "values(?, ?, ?, ?, ?)";
+
+        String sqlEmpleado = "insert into empleado"
+                + " (id, rol)"
+                + "values(?, ?)";
+
+        try (Connection con = Conexion.conectar()) {
+            con.setAutoCommit(false);
+
+            try {
+
+                int idGenerado;
+
+                try (PreparedStatement ps = con.prepareStatement(
+                        sqlPersona, Statement.RETURN_GENERATED_KEYS
+                )) {
+                    ps.setString(1, empleado.getNombre());
+                    ps.setString(2, empleado.getDocumento());
+                    ps.setString(3, empleado.getCorreo());
+                    ps.setString(4, empleado.getTelefono());
+                    ps.setString(5, empleado.getDireccion());
+
+                    ps.executeUpdate();
+                    try (ResultSet rs = ps.getGeneratedKeys()) {
+
+                        if (!rs.next()) {
+                            throw new SQLException(
+                                    "No se pudo obtener el ID.");
+                        }
+
+                        idGenerado = rs.getInt(1);
+                    }
+                }
+
+                try (PreparedStatement ps
+                        = con.prepareStatement(sqlEmpleado)) {
+
+                    ps.setInt(1, idGenerado);
+                    ps.setString(
+                            2, empleado.getRol().name());
+
+                    ps.executeUpdate();
+                }
+
+                con.commit();
+
+                empleado.setId(idGenerado);
 
             } catch (SQLException e) {
 
-                throw new DAOException("Error al buscar el empleado \n", e);
+                try {
+                    con.rollback();
+                } catch (SQLException errorRollback) {
+                    e.addSuppressed(errorRollback);
+                }
+
+                throw new DAOException(
+                        "Error al registrar el empleado.", e);
+
+            } finally {
+                con.setAutoCommit(true);
             }
 
-            return null;
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "Error de conexion o transaccion.", e);
+        }
+    }
 
-        }}
+    //VERIFICAR SI EL COCUMENTO YA EXISTE EN PERSONA
+    public boolean existeDocumento(String documento) throws DAOException {
+        String sql = "select id from persona where documento=?";
+
+        try (Connection con = Conexion.conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, documento);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                return rs.next();
+
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException("Error al verificar el documento.", e);
+
+        }
+
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+}
