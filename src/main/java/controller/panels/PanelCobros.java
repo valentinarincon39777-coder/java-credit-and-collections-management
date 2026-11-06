@@ -5,15 +5,19 @@ import java.util.Scanner;
 import model.entity.Empleado;
 import view.panel.MenuPanelCobros;
 import view.Mensajes;
+import controller.ControllerCliente;
 
 public class PanelCobros {
 
     private final MenuPanelCobros menu;
     private final Mensajes mensajes;
+    private final ControllerCliente controllerCliente;
 
     public PanelCobros(Scanner entrada) {
         menu = new MenuPanelCobros(entrada);
         mensajes = new Mensajes();
+        controllerCliente=new ControllerCliente(entrada);
+        
     }
 
     public void iniciar(Empleado empleado) {
@@ -26,9 +30,9 @@ public class PanelCobros {
             switch (opcion) {
 
                 case 1:
-                    mensajes.informativo(
-                            "Consultar clientes: funcionalidad en desarrollo."
-                    );
+                
+                           controllerCliente.consultarClientes(); 
+                    
                     break;
 
                 case 2:

@@ -1,19 +1,21 @@
-
 package controller.panels;
 
 import java.util.Scanner;
 import model.entity.Empleado;
 import view.panel.MenuPanelAnalista;
 import view.Mensajes;
+import controller.ControllerSolicitud;
 
 public class PanelAnalista {
 
     private final MenuPanelAnalista menu;
     private final Mensajes mensajes;
+    private final ControllerSolicitud controllerSolicitud;
 
     public PanelAnalista(Scanner entrada) {
         menu = new MenuPanelAnalista(entrada);
         mensajes = new Mensajes();
+        controllerSolicitud = new ControllerSolicitud(entrada);
     }
 
     public void iniciar(Empleado empleado) {
@@ -26,9 +28,7 @@ public class PanelAnalista {
             switch (opcion) {
 
                 case 1:
-                    mensajes.informativo(
-                            "Consultar solicitudes: funcionalidad en desarrollo."
-                    );
+                    controllerSolicitud.consultarTodas();
                     break;
 
                 case 2:

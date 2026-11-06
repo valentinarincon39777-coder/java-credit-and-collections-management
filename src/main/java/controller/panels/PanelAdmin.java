@@ -5,17 +5,23 @@ import model.entity.Empleado;
 import view.panel.MenuPanelAdmin;
 import view.Mensajes;
 import controller.ControllerEmpleado;
+import controller.ControllerCliente;
+import controller.ControllerSolicitud;
 
 public class PanelAdmin {
 
     private final MenuPanelAdmin menu;
     private final Mensajes mensajes;
     private final ControllerEmpleado controllerEmpleado;
+    private final ControllerCliente controllerCliente;
+    private final ControllerSolicitud controllerSolicitud;
 
     public PanelAdmin(Scanner entrada) {
         menu = new MenuPanelAdmin(entrada);
         mensajes = new Mensajes();
         controllerEmpleado = new ControllerEmpleado(entrada);
+        controllerCliente = new ControllerCliente(entrada);
+        controllerSolicitud = new ControllerSolicitud(entrada);
     }
 
     public void iniciar(Empleado empleado) {
@@ -32,9 +38,8 @@ public class PanelAdmin {
                     break;
 
                 case 2:
-                    mensajes.informativo(
-                            "Consultar clientes: funcionalidad en desarrollo."
-                    );
+                    controllerCliente.consultarClientes();
+
                     break;
 
                 case 3:
@@ -44,9 +49,7 @@ public class PanelAdmin {
                     break;
 
                 case 4:
-                    mensajes.informativo(
-                            "Consultar solicitudes: funcionalidad en desarrollo."
-                    );
+                    controllerSolicitud.consultarTodas();
                     break;
 
                 case 5:

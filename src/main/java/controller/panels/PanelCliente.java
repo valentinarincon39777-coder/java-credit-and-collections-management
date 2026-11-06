@@ -1,21 +1,21 @@
-
 package controller.panels;
 
 import java.util.Scanner;
 import model.entity.Cliente;
 import view.panel.MenuPanelCliente;
 import view.Mensajes;
-
-
+import controller.ControllerSolicitud;
 
 public class PanelCliente {
 
     private final MenuPanelCliente menu;
     private final Mensajes mensajes;
+    private final ControllerSolicitud controllerSolicitud;
 
     public PanelCliente(Scanner entrada) {
         menu = new MenuPanelCliente(entrada);
         mensajes = new Mensajes();
+        controllerSolicitud = new ControllerSolicitud(entrada);
     }
 
     public void iniciar(Cliente cliente) {
@@ -28,15 +28,11 @@ public class PanelCliente {
             switch (opcion) {
 
                 case 1:
-                    mensajes.informativo(
-                            "Solicitar prestamo: funcionalidad en desarrollo."
-                    );
+                    controllerSolicitud.registrarComoCliente(cliente);
                     break;
 
                 case 2:
-                    mensajes.informativo(
-                            "Consultar solicitudes: funcionalidad en desarrollo."
-                    );
+                    controllerSolicitud.consultarComoCliente(cliente);
                     break;
 
                 case 3:

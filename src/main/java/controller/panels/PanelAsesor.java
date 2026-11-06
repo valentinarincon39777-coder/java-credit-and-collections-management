@@ -6,17 +6,20 @@ import view.panel.MenuPanelAsesor;
 import view.Mensajes;
 
 import controller.ControllerCliente;
+import controller.ControllerSolicitud;
 
 public class PanelAsesor {
 
     private final MenuPanelAsesor menu;
     private final Mensajes mensajes;
     private final ControllerCliente controllerCliente;
+    private final ControllerSolicitud controllerSolicitud;
 
     public PanelAsesor(Scanner entrada) {
         menu = new MenuPanelAsesor(entrada);
         mensajes = new Mensajes();
         controllerCliente = new ControllerCliente(entrada);
+        controllerSolicitud = new ControllerSolicitud(entrada);
     }
 
     public void iniciar(Empleado empleado) {
@@ -32,15 +35,11 @@ public class PanelAsesor {
                     break;
 
                 case 2:
-                    mensajes.informativo(
-                            "Registrar solicitud de prestamo: funcionalidad en desarrollo."
-                    );
+                    controllerSolicitud.registrarComoAsesor(empleado);
                     break;
 
                 case 3:
-                    mensajes.informativo(
-                            "Consultar mis solicitudes: funcionalidad en desarrollo."
-                    );
+                    controllerSolicitud.consultarComoAsesor(empleado);
                     break;
 
                 case 0:
