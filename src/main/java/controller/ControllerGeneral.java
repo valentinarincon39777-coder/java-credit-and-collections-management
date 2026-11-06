@@ -88,14 +88,14 @@ public class ControllerGeneral {
                     "¡Bienvenido/a, " + cliente.getNombre() + "!"
             );
 
-            PanelCliente panel = new PanelCliente();
+            PanelCliente panel = new PanelCliente(entrada);
             panel.iniciar(cliente);
 
         } catch (DAOException e) {
             menu.mostrarError(
                     "No fue posible consultar la base de datos."
             );
-            e.printStackTrace();
+           
         }
     }
 
@@ -144,7 +144,7 @@ public class ControllerGeneral {
             menu.mostrarError(
                     "No fue posible consultar la base de datos."
             );
-            e.printStackTrace();
+           
         }
     }
 
@@ -154,22 +154,22 @@ public class ControllerGeneral {
         switch (empleado.getRol()) {
 
             case administrador_general:
-                PanelAdmin admin = new PanelAdmin();
+                PanelAdmin admin = new PanelAdmin(entrada);
                 admin.iniciar(empleado);
                 break;
 
             case asesor_creditos:
-                PanelAsesor asesor = new PanelAsesor();
+                PanelAsesor asesor = new PanelAsesor(entrada);
                 asesor.iniciar(empleado);
                 break;
 
             case analista_creditos:
-                PanelAnalista analista = new PanelAnalista();
+                PanelAnalista analista = new PanelAnalista(entrada);
                 analista.iniciar(empleado);
                 break;
 
             case gestor_cobros:
-                PanelCobros gestor = new PanelCobros();
+                PanelCobros gestor = new PanelCobros(entrada);
                 gestor.iniciar(empleado);
                 break;
         }

@@ -1,22 +1,53 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package controller.panels;
 
-/**
- *
- * @author valen
- */
-
+import java.util.Scanner;
 import model.entity.Empleado;
+import view.panel.MenuPanelAsesor;
+import view.Mensajes;
 
 public class PanelAsesor {
+
+    private final MenuPanelAsesor menu;
+    private final Mensajes mensajes;
+
+    public PanelAsesor(Scanner entrada) {
+        menu = new MenuPanelAsesor(entrada);
+        mensajes = new Mensajes();
+    }
+
     public void iniciar(Empleado empleado) {
 
-        System.out.println("=== PANEL ASESOR ===");
-        System.out.println("Empleado: " + empleado.getNombre());
-        System.out.println("Panel en construcción.");
+        int opcion;
+
+        do {
+            opcion = menu.mostrarMenu();
+
+            switch (opcion) {
+
+                case 1:
+                    mensajes.informativo(
+                            "Gestionar clientes: funcionalidad en desarrollo."
+                    );
+                    break;
+
+                case 2:
+                    mensajes.informativo(
+                            "Registrar solicitud de prestamo: funcionalidad en desarrollo."
+                    );
+                    break;
+
+                case 3:
+                    mensajes.informativo(
+                            "Consultar mis solicitudes: funcionalidad en desarrollo."
+                    );
+                    break;
+
+                case 0:
+                    mensajes.informativo("Sesion cerrada correctamente.");
+                    break;
+            }
+
+        } while (opcion != 0);
     }
-    
 }
