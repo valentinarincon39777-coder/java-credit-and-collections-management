@@ -91,7 +91,7 @@ public class CuotaDAO {
                     "No se pudieron consultar las cuotas.", e);
         }
 
-        return cuotas;
+        return cuotas; 
     }
 
     // CONVERTIR RESULTSET EN CUOTA********************************

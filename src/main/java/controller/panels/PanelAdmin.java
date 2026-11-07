@@ -7,6 +7,7 @@ import view.Mensajes;
 import controller.ControllerEmpleado;
 import controller.ControllerCliente;
 import controller.ControllerSolicitud;
+import controller.ControllerPrestamo;
 
 public class PanelAdmin {
 
@@ -15,6 +16,7 @@ public class PanelAdmin {
     private final ControllerEmpleado controllerEmpleado;
     private final ControllerCliente controllerCliente;
     private final ControllerSolicitud controllerSolicitud;
+    private final ControllerPrestamo controllerPrestamo;
 
     public PanelAdmin(Scanner entrada) {
         menu = new MenuPanelAdmin(entrada);
@@ -22,6 +24,7 @@ public class PanelAdmin {
         controllerEmpleado = new ControllerEmpleado(entrada);
         controllerCliente = new ControllerCliente(entrada);
         controllerSolicitud = new ControllerSolicitud(entrada);
+        controllerPrestamo = new ControllerPrestamo(entrada);
     }
 
     public void iniciar(Empleado empleado) {
@@ -53,9 +56,7 @@ public class PanelAdmin {
                     break;
 
                 case 5:
-                    mensajes.informativo(
-                            "Consultar prestamos: funcionalidad en desarrollo."
-                    );
+                    controllerPrestamo.consultarComoPersonal();
                     break;
 
                 case 6:

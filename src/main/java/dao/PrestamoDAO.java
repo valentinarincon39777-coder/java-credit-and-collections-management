@@ -188,6 +188,61 @@ public class PrestamoDAO {
                     "No se pudieron actualizar los vencimientos.", e);
         }
     }
+    
+    
+    
+    // CONSULTAR TODOS LOS PRESTAMOS***********************************+++
+    public List<Prestamo> listarTodos() throws DAOException {
+
+        String sql = "SELECT * FROM prestamo ORDER BY id DESC";
+
+        List<Prestamo> prestamos = new ArrayList<>();
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+                prestamos.add(construirPrestamo(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudieron consultar los prestamos.", e);
+        }
+
+        return prestamos;
+    }
+
+    // CONSULTAR PRESTAMOS VENCIDOS******************************************+
+    public List<Prestamo> listarVencidos() throws DAOException {
+
+        String sql = "SELECT * FROM prestamo "
+                + "WHERE estado = 'vencido' "
+                + "ORDER BY id DESC";
+
+        List<Prestamo> prestamos = new ArrayList<>();
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+                prestamos.add(construirPrestamo(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudieron consultar los prestamos vencidos.", e);
+        }
+
+        return prestamos;
+    }
+
 
     
     

@@ -1,4 +1,3 @@
-
 package controller.panels;
 
 import java.util.Scanner;
@@ -7,17 +6,21 @@ import view.panel.MenuPanelCobros;
 import view.Mensajes;
 import controller.ControllerCliente;
 
+import controller.ControllerPrestamo;
+
 public class PanelCobros {
 
     private final MenuPanelCobros menu;
     private final Mensajes mensajes;
     private final ControllerCliente controllerCliente;
+    private final ControllerPrestamo controllerPrestamo;
 
     public PanelCobros(Scanner entrada) {
         menu = new MenuPanelCobros(entrada);
         mensajes = new Mensajes();
-        controllerCliente=new ControllerCliente(entrada);
-        
+        controllerCliente = new ControllerCliente(entrada);
+        controllerPrestamo = new ControllerPrestamo(entrada);
+
     }
 
     public void iniciar(Empleado empleado) {
@@ -30,17 +33,14 @@ public class PanelCobros {
             switch (opcion) {
 
                 case 1:
-                
-                           controllerCliente.consultarClientes(); 
-                    
+
+                    controllerCliente.consultarClientes();
+
                     break;
 
                 case 2:
-                    mensajes.informativo(
-                            "Consultar prestamos y sus cuotas: funcionalidad en desarrollo."
-                    );
+                    controllerPrestamo.consultarComoPersonal();
                     break;
-
 
                 case 3:
                     mensajes.informativo(
