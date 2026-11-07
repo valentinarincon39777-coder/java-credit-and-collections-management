@@ -37,6 +37,8 @@ public class AmortizacionFrancesa
 
         // CALCULAR LA CUOTA MENSUAL FIJA
         BigDecimal cuotaFija;
+        
+        //si es cero la tasa de ineteres 
 
         if (tasaMensual.compareTo(BigDecimal.ZERO) == 0) {
 
@@ -45,11 +47,17 @@ public class AmortizacionFrancesa
                     2, RoundingMode.HALF_UP);
 
         } else {
-
+            
+        
+            //si no es cero, usa la formula de amortizacion francesa
+            
+            
+            //genera el factor  =(1+i)^n
             BigDecimal factor =
                     BigDecimal.ONE.add(tasaMensual)
                             .pow(cantidadCuotas, PRECISION);
-
+             //P=monto
+            //Cuota fija = P*i*factor/factor-1
             cuotaFija = monto.multiply(tasaMensual, PRECISION)
                     .multiply(factor, PRECISION)
                     .divide(
@@ -63,17 +71,28 @@ public class AmortizacionFrancesa
 
         // GENERAR EL CALENDARIO
         for (int i = 1; i <= cantidadCuotas; i++) {
-
+            //interes= saldoPendiente*tasaMensual 
             BigDecimal interes = saldoCapital
                     .multiply(tasaMensual)
                     .setScale(2, RoundingMode.HALF_UP);
+            
+            /*
+            
+            Capital: representa la parte de la cuota que realmente reduce la deuda.
+
+            MontoCuota: representa el dinero total que el cliente debe pagar en ese periodo.
+            
+            CUOTA=CAPITAL + INTERES 
+            
+            */
 
             BigDecimal capital;
             BigDecimal montoCuota;
 
-            if (i == cantidadCuotas) {
+            if (i == cantidadCuotas) { 
 
                 // LA ULTIMA CUOTA LIQUIDA TODO EL CAPITAL
+                //ultima cuota tiene pequeña diferencia respeto a las anteriores, para que el saldo pendiente quede totalmente en CERO
                 capital = saldoCapital;
                 montoCuota = capital.add(interes);
 
@@ -110,6 +129,8 @@ public class AmortizacionFrancesa
             );
 
             cuotas.add(cuota);
+            
+            //una vez se generó cuota, ahora hay que descontrar de la deuda la parte que corresponde al capital
 
             saldoCapital = saldoCapital.subtract(capital);
         }
