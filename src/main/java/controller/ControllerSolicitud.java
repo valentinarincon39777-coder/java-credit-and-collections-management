@@ -44,6 +44,9 @@ import model.enums.EstadoEmpleado;
 import model.enums.EstadoSolicitud;
 
 
+import model.entity.SolicitudEvaluacion;
+
+
 
 
 
@@ -200,8 +203,8 @@ public class ControllerSolicitud {
         try {
 
             // 1. LISTAR SOLICITUDES PENDIENTES
-            List<Solicitud> pendientes =
-                    solicitudDAO.listarPendientes();
+            List<SolicitudEvaluacion> pendientes =
+                    solicitudDAO.listarPendientesConDatos();
 
             if (pendientes.isEmpty()) {
                 mensajes.informativo(
@@ -209,7 +212,7 @@ public class ControllerSolicitud {
                 return;
             }
 
-            vista.mostrarPendientes(pendientes);
+            vista.mostrarPendientesConDatos(pendientes);
 
             // 2. SOLICITAR ID
             int solicitudId = vista.solicitarIdEvaluacion();
@@ -220,12 +223,12 @@ public class ControllerSolicitud {
             }
 
             // 3. COMPROBAR QUE EL ID ESTE EN LA LISTA
-            Solicitud seleccionada = null;
+            SolicitudEvaluacion seleccionada = null;
 
-            for (Solicitud solicitud : pendientes) {
+            for (SolicitudEvaluacion datos : pendientes) {
 
-                if (solicitud.getId() == solicitudId) {
-                    seleccionada = solicitud;
+                if (datos.getSolicitud().getId() == solicitudId) {
+                    seleccionada = datos;
                     break;
                 }
             }
@@ -237,7 +240,7 @@ public class ControllerSolicitud {
             }
 
        
-            vista.mostrarSolicitud(seleccionada);
+            vista.mostrarPendientesConDatos(List.of(seleccionada));
 
          
             char decision = vista.solicitarDecision();

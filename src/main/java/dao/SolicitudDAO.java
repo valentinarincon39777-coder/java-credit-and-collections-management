@@ -27,6 +27,8 @@ import dao.CuotaDAO;
 import strategy.AmortizacionFrancesa;
 import utils.CalculadoraCuotas;
 
+import model.entity.SolicitudEvaluacion;
+
 public class SolicitudDAO {
 
     // REGISTRAR SOLICITUD****************************************************
@@ -465,6 +467,67 @@ public class SolicitudDAO {
                     "No se pudo rechazar la solicitud.", e);
         }
     }
+    
+    
+    
+    // CONSULTAR SOLICITUDES PENDIENTES CON DATOS FINANCIEROS**********************************
+    public List<SolicitudEvaluacion> listarPendientesConDatos()
+            throws DAOException {
+
+        String sql =
+                "SELECT s.*, p.nombre, p.documento, "
+                + "c.salario_formal, c.puntos_positivos, "
+                + "c.puntos_negativos "
+                + "FROM solicitud_prestamo s "
+                + "JOIN cliente c ON s.cliente_fk = c.id "
+                + "JOIN persona p ON c.id = p.id "
+                + "WHERE s.estado_solicitud = 'pendiente' "
+                + "ORDER BY s.fecha_solicitud DESC, s.id DESC";
+
+        List<SolicitudEvaluacion> solicitudes =
+                new ArrayList<>();
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+
+                Solicitud solicitud = construirSolicitud(rs);
+
+                SolicitudEvaluacion datos =
+                        new SolicitudEvaluacion(
+                                solicitud,
+                                rs.getString("nombre"),
+                                rs.getString("documento"),
+                                rs.getBigDecimal("salario_formal"),
+                                rs.getInt("puntos_positivos"),
+                                rs.getInt("puntos_negativos")
+                        );
+
+                solicitudes.add(datos);
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudieron consultar las solicitudes pendientes.", e);
+        }
+
+        return solicitudes;
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     
 }

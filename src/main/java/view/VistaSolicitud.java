@@ -8,6 +8,8 @@ import java.util.Scanner;
 import model.entity.Solicitud;
 import utils.Validacion;
 
+import model.entity.SolicitudEvaluacion;
+
 public class VistaSolicitud {
 
     private final Validacion validacion;
@@ -118,7 +120,7 @@ public class VistaSolicitud {
         );
     }
 
-    // ELEGIR APROBAR O DENEGAR
+    // ELEGIR APROBAR O DENEGAR************************************
     public char solicitarDecision() {
 
         return validacion.validarLetra(
@@ -128,13 +130,68 @@ public class VistaSolicitud {
         );
     }
 
-    // PEDIR MOTIVO DE RECHAZO
+    // PEDIR MOTIVO DE RECHAZO************************************************
     public String solicitarMotivoRechazo() {
 
         return validacion.validarTextoLibre(
                 "Ingrese el motivo del rechazo:", 45
         );
     }
+    
+    
+    // MOSTRAR SOLICITUDES PENDIENTES CON DATOS FINANCIEROS**********************************
+    public void mostrarPendientesConDatos(
+            List<SolicitudEvaluacion> solicitudes) {
+
+        System.out.println(
+                "\n===== SOLICITUDES PENDIENTES =====");
+
+        if (solicitudes.isEmpty()) {
+            System.out.println("No hay solicitudes pendientes.");
+            return;
+        }
+
+        for (SolicitudEvaluacion datos : solicitudes) {
+
+            Solicitud solicitud = datos.getSolicitud();
+
+            System.out.println("\n-----------------------------");
+
+            System.out.println("Solicitud ID: "
+                    + solicitud.getId());
+
+            System.out.println("Cliente: "
+                    + datos.getNombreCliente());
+
+            System.out.println("Cedula: "
+                    + datos.getDocumentoCliente());
+
+            System.out.println("Salario formal: $"
+                    + datos.getSalarioFormal());
+
+            System.out.println("Puntos positivos: "
+                    + datos.getPuntosPositivos());
+
+            System.out.println("Puntos negativos: "
+                    + datos.getPuntosNegativos());
+
+            System.out.println("Monto solicitado: $"
+                    + solicitud.getMontoSolicitado());
+
+            System.out.println("Cantidad de cuotas: "
+                    + solicitud.getCantidadCuotas());
+
+            System.out.println("Fecha de solicitud: "
+                    + solicitud.getFechaSolicitud());
+
+            System.out.println("Estado: "
+                    + solicitud.getEstado());
+        }
+    }
+
+    
+    
+    
 
     
 }
