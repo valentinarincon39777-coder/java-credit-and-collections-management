@@ -51,7 +51,7 @@ public class VistaPrestamo {
         System.out.println();
     }
 
-    // IMPRIMIR TEXTO DENTRO DEL RECUADRO
+    // IMPRIMIR TEXTO DENTRO DEL RECUADRO**********************
     private void imprimirLinea(String texto) {
 
         System.out.printf("| %-64s |%n", texto);
@@ -64,4 +64,16 @@ public class VistaPrestamo {
         System.out.println(
                 "\nNo tienes prestamos registrados.");
     }
+    
+    
+    
+    // MOSTRAR EL SUB MENU DE LAS CONSULTAS DE PRESTAMOS Y CUOTAS para el panel de admin y getsor de cobros**********************************
+    public void mostrarMenuConsultas() {
+    System.out.println("\n====== CONSULTAR PRESTAMOS Y CUOTAS ======");
+    System.out.println("1. Ver todos los prestamos y cuotas");
+    System.out.println("2. Buscar prestamos y cuotas por cliente");
+    System.out.println("3. Ver prestamos vencidos");
+    System.out.println("0. Volver");
+}
+    
 }
