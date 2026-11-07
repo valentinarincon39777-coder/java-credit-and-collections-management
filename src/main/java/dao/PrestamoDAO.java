@@ -19,7 +19,7 @@ import model.enums.EstadoPrestamo;
 
 public class PrestamoDAO {
 
-    // INSERTAR PRESTAMO CON UNA CONEXION EXISTENTE******************************************
+    // INSERTAR PRESTAMO CON CONEXION COMPARTIDA DE SOLICITUD******************************************
     public void insertar(Prestamo prestamo, Connection con)
             throws SQLException {
 

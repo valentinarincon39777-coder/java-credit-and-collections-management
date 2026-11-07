@@ -38,6 +38,11 @@ import model.entity.Solicitud;
 import view.Mensajes;
 import view.VistaSolicitud;
 
+import java.util.List;
+import model.enums.Rol;
+import model.enums.EstadoEmpleado;
+import model.enums.EstadoSolicitud;
+
 
 
 
@@ -177,6 +182,137 @@ public class ControllerSolicitud {
                     "No fue posible consultar las solicitudes.");
         }
     }
+    
+    
+    
+    // EVALUAR SOLICITUDES PENDIENTES*********************************************
+    public void evaluarSolicitudes(Empleado analista) {
+
+        // comprobar que empleado sea analista activo
+        if (analista == null
+                || analista.getRol() != Rol.analista_creditos
+                || analista.getEstado() != EstadoEmpleado.activo) {
+
+            mensajes.error("No tienes permiso para evaluar solicitudes.");
+            return;
+        }
+
+        try {
+
+            // 1. LISTAR SOLICITUDES PENDIENTES
+            List<Solicitud> pendientes =
+                    solicitudDAO.listarPendientes();
+
+            if (pendientes.isEmpty()) {
+                mensajes.informativo(
+                        "No hay solicitudes pendientes de evaluacion.");
+                return;
+            }
+
+            vista.mostrarPendientes(pendientes);
+
+            // 2. SOLICITAR ID
+            int solicitudId = vista.solicitarIdEvaluacion();
+
+            if (solicitudId == 0) {
+                mensajes.informativo("Evaluacion cancelada.");
+                return;
+            }
+
+            // 3. COMPROBAR QUE EL ID ESTE EN LA LISTA
+            Solicitud seleccionada = null;
+
+            for (Solicitud solicitud : pendientes) {
+
+                if (solicitud.getId() == solicitudId) {
+                    seleccionada = solicitud;
+                    break;
+                }
+            }
+
+            if (seleccionada == null) {
+                mensajes.error(
+                        "La solicitud no existe o no esta pendiente.");
+                return;
+            }
+
+       
+            vista.mostrarSolicitud(seleccionada);
+
+         
+            char decision = vista.solicitarDecision();
+
+            if (decision == 'C') {
+                mensajes.informativo("Evaluacion cancelada.");
+                return;
+            }
+
+            boolean resultado;
+
+            if (decision == 'A') {
+
+                // APROBAR SOLICITUD
+                resultado = solicitudDAO.aprobarSolicitud(
+                        solicitudId, analista.getId());
+
+                if (resultado) {
+
+                    mensajes.exito(
+                            "Solicitud aprobada correctamente. "
+                            + "Se ha generado el prestamo "
+                            + "y su calendario de cuotas.");
+
+                } else {
+
+                    mensajes.error(
+                            "La solicitud ya no esta pendiente "
+                            + "o el cliente tiene un prestamo vigente.");
+                }
+
+            } else {
+
+                // DENEGAR SOLICITUD
+                String motivo = vista.solicitarMotivoRechazo();
+
+                resultado = solicitudDAO.rechazarSolicitud(
+                        solicitudId,
+                        analista.getId(),
+                        motivo
+                );
+
+                if (resultado) {
+
+                    mensajes.exito(
+                            "Solicitud denegada correctamente.");
+
+                } else {
+
+                    mensajes.error(
+                            "La solicitud ya fue evaluada "
+                            + "o no existe.");
+                }
+            }
+
+        } catch (DAOException e) {
+
+            mensajes.error(
+                    "No fue posible completar la evaluacion.");
+
+        } catch (IllegalArgumentException e) {
+
+            mensajes.error(
+                    "Los datos de la solicitud no permiten "
+                    + "completar la evaluacion.");
+        }
+    }
+
+    
+    
+    
+    
+    
+    
+    
 }
     
     

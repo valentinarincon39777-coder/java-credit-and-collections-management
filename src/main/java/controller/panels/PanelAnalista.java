@@ -32,9 +32,7 @@ public class PanelAnalista {
                     break;
 
                 case 2:
-                    mensajes.informativo(
-                            "Evaluar solicitudes pendientes: funcionalidad en desarrollo."
-                    );
+                    controllerSolicitud.evaluarSolicitudes(empleado);
                     break;
 
                 case 0:

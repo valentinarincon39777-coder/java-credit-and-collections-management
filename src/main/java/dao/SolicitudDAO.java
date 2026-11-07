@@ -17,6 +17,16 @@ import java.util.List;
 import model.entity.Solicitud;
 import model.enums.EstadoSolicitud;
 
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import model.entity.Prestamo;
+import model.entity.Cuota;
+import dao.PrestamoDAO;
+import dao.CuotaDAO;
+import strategy.AmortizacionFrancesa;
+import utils.CalculadoraCuotas;
+
 public class SolicitudDAO {
 
     // REGISTRAR SOLICITUD****************************************************
@@ -197,7 +207,7 @@ public class SolicitudDAO {
         return solicitudes;
     }
 
-    // CONVERTIR FILA SQL EN SOLICITUD
+    // CONVERTIR FILA SQL EN SOLICITUD****************************
     private Solicitud construirSolicitud(ResultSet rs)
             throws SQLException {
 
@@ -220,4 +230,241 @@ public class SolicitudDAO {
                 rs.getString("motivo_rechazo")
         );
     }
+    
+    
+    
+    
+    // CONSULTAR SOLICITUDES PENDIENTES (funcionalidad del analista que aprobara las solicitudes)
+    public List<Solicitud> listarPendientes()
+            throws DAOException {
+
+        return listarSolicitudes(
+                "WHERE estado_solicitud = 'pendiente'", null);
+    }
+
+    
+    
+    
+    
+    // APROBAR SOLICITUD Y GENERAR PRESTAMO CON CUOTAS*****************************************
+    //Validar → Calcular → Actualizar solicitud → Insertar préstamo → Insertar cuotas → Commit
+    public boolean aprobarSolicitud(int solicitudId, int analistaId)
+            throws DAOException {
+
+        String sqlCliente =
+                "SELECT cliente_fk FROM solicitud_prestamo "
+                + "WHERE id = ?";
+
+        String sqlBloquearCliente =
+                "SELECT id FROM cliente WHERE id = ? FOR UPDATE";
+
+        String sqlSolicitud =
+                "SELECT * FROM solicitud_prestamo "
+                + "WHERE id = ? FOR UPDATE";
+        
+        
+        
+        
+        String sqlPrestamoVigente =
+                "SELECT p.id FROM prestamo p "
+                + "JOIN solicitud_prestamo s "
+                + "ON p.solicitud_fk = s.id "
+                + "WHERE s.cliente_fk = ? "
+                + "AND p.estado IN ('activo', 'vencido') LIMIT 1";
+
+        String sqlActualizar =
+                "UPDATE solicitud_prestamo "
+                + "SET estado_solicitud = 'aceptado', "
+                + "analista_fk = ?, fecha_evaluacion = NOW() "
+                + "WHERE id = ? AND estado_solicitud = 'pendiente'";
+
+        try (Connection con = Conexion.conectar()) {
+
+            con.setAutoCommit(false);
+
+            try {
+                int clienteId;
+
+                // 1. IDENTIFICAR AL CLIENTE
+                try (PreparedStatement ps =
+                        con.prepareStatement(sqlCliente)) {
+
+                    ps.setInt(1, solicitudId);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+
+                        if (!rs.next()) {
+                            con.rollback();
+                            return false;
+                        }
+
+                        clienteId = rs.getInt("cliente_fk");
+                    }
+                }
+
+                // 2. BLOQUEAR AL CLIENTE
+                try (PreparedStatement ps =
+                        con.prepareStatement(sqlBloquearCliente)) {
+
+                    ps.setInt(1, clienteId);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+
+                        if (!rs.next()) {
+                            con.rollback();
+                            return false;
+                        }
+                    }
+                }
+
+                Solicitud solicitud;
+
+                // 3. BLOQUEAR Y COMPROBAR LA SOLICITUD
+                try (PreparedStatement ps =
+                        con.prepareStatement(sqlSolicitud)) {
+
+                    ps.setInt(1, solicitudId);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+
+                        if (!rs.next()) {
+                            con.rollback();
+                            return false;
+                        }
+
+                        solicitud = construirSolicitud(rs);
+                    }
+                }
+
+                if (solicitud.getEstado() != EstadoSolicitud.pendiente) {
+                    con.rollback();
+                    return false;
+                }
+
+                // 4. COMPROBAR QUE NO EXISTA PRESTAMO VIGENTE
+                if (existeRegistro(con, sqlPrestamoVigente, clienteId)) {
+                    con.rollback();
+                    return false;
+                }
+
+                // 5. CALCULAR CUOTAS UTILIZANDO STRATEGY
+                CalculadoraCuotas calculadora =
+                        new CalculadoraCuotas(new AmortizacionFrancesa());
+                
+                //momento de desembolso es justo cuando se aprueba la solicitud
+                LocalDateTime desembolso = LocalDateTime.now();
+
+                List<Cuota> cuotas = calculadora.generarCalendario(
+                        solicitud.getMontoSolicitado(),
+                        solicitud.getCantidadCuotas(),
+                        desembolso.toLocalDate()
+                );
+
+                var totalPagar = calculadora.calcularTotalPagar(cuotas);
+
+                // 6. CREAR OBJETO PRESTAMO
+                Prestamo prestamo = new Prestamo(
+                        solicitudId,
+                        calculadora.getTasaMensualPorcentaje(),
+                        totalPagar,
+                        desembolso,
+                        cuotas.get(cuotas.size() - 1).getFechaLimite()
+                );
+
+                // 7. ACTUALIZAR LA SOLICITUD
+                //pasar solicitud a estado 'aceptado'
+                try (PreparedStatement ps =
+                        con.prepareStatement(sqlActualizar)) {
+
+                    ps.setInt(1, analistaId);
+                    ps.setInt(2, solicitudId);
+
+                    if (ps.executeUpdate() != 1) {
+                        con.rollback();
+                        return false;
+                    }
+                }
+
+                // 8. INSERTAR PRESTAMO CON LA MISMA CONEXION
+                PrestamoDAO prestamoDAO = new PrestamoDAO();
+                prestamoDAO.insertar(prestamo, con);
+
+                // 9. ASIGNAR ID DEL PRESTAMO A CADA CUOTA
+                for (Cuota cuota : cuotas) {
+                    cuota.setPrestamoId(prestamo.getId());
+                }
+
+                // 10. INSERTAR TODAS LAS CUOTAS
+                CuotaDAO cuotaDAO = new CuotaDAO();
+                cuotaDAO.insertarCuotas(cuotas, con);
+
+                // 11. CONFIRMAR TODA LA OPERACION
+                con.commit();
+
+                return true;
+
+            } catch (SQLException | RuntimeException e) {
+
+                try {
+                    con.rollback();
+                } catch (SQLException error) {
+                    e.addSuppressed(error);
+                }
+
+                throw new DAOException(
+                        "No se pudo completar la aprobacion.", e);
+
+            } finally {
+                con.setAutoCommit(true);
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudo completar la transaccion.", e);
+        }
+    }
+
+    
+    
+    
+    
+    
+    
+    // RECHAZAR SOLICITUD PENDIENTE******************************************************
+    public boolean rechazarSolicitud(
+            int solicitudId, int analistaId, String motivo)
+            throws DAOException {
+
+        if (motivo == null || motivo.isBlank()
+                || motivo.length() > 45) {
+
+            throw new IllegalArgumentException(
+                    "El motivo de rechazo no es valido.");
+        }
+
+        String sql =
+                "UPDATE solicitud_prestamo "
+                + "SET estado_solicitud = 'denegado', "
+                + "analista_fk = ?, fecha_evaluacion = NOW(), "
+                + "motivo_rechazo = ? "
+                + "WHERE id = ? AND estado_solicitud = 'pendiente'";
+
+        try (
+            Connection con = Conexion.conectar();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, analistaId);
+            ps.setString(2, motivo);
+            ps.setInt(3, solicitudId);
+
+            return ps.executeUpdate() == 1;
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudo rechazar la solicitud.", e);
+        }
+    }
+
+    
 }

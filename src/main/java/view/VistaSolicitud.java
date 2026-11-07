@@ -99,4 +99,42 @@ public class VistaSolicitud {
             mostrarSolicitud(solicitud);
         }
     }
+    
+    
+    // MOSTRAR SOLICITUDES PENDIENTES*******************************************
+    public void mostrarPendientes(List<Solicitud> solicitudes) {
+
+        System.out.println("\n===== SOLICITUDES PENDIENTES =====");
+
+        mostrarSolicitudes(solicitudes);
+    }
+
+    // SELECCIONAR SOLICITUD POR ID**************************************************
+    public int solicitarIdEvaluacion() {
+
+        return validacion.validarEnteroRango(
+                "\nIngrese el ID de la solicitud (0 para cancelar):",
+                0, Integer.MAX_VALUE
+        );
+    }
+
+    // ELEGIR APROBAR O DENEGAR
+    public char solicitarDecision() {
+
+        return validacion.validarLetra(
+                
+                "\nA = Aprobar | D = Denegar | C = Cancelar",
+                "ADC"
+        );
+    }
+
+    // PEDIR MOTIVO DE RECHAZO
+    public String solicitarMotivoRechazo() {
+
+        return validacion.validarTextoLibre(
+                "Ingrese el motivo del rechazo:", 45
+        );
+    }
+
+    
 }
