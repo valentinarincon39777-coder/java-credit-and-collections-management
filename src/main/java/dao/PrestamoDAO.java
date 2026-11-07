@@ -123,7 +123,7 @@ public class PrestamoDAO {
         return prestamos;
     }
 
-    // CONSTRUIR OBJETO PRESTAMO
+    // CONSTRUIR OBJETO PRESTAMO**************************************
     private Prestamo construirPrestamo(ResultSet rs)
             throws SQLException {
 
@@ -141,4 +141,58 @@ public class PrestamoDAO {
                         rs.getString("estado"))
         );
     }
+    
+    
+    
+    // ACTUALIZAR ESTADOS SEGUN LAS FECHAS DE VENCIMIENTO******************************
+    
+    //REGLA: un prestamo se marca como vencido SOLO si todas sus cuotas estan vencidas
+    //o sea, si la fecha ultima de vencimiento esta vencida 
+    public void actualizarVencimientos() throws DAOException {
+
+        String sqlCuotas =
+                "UPDATE cuota SET estado = 'vencida' "
+                + "WHERE estado = 'pendiente' "
+                + "AND fecha_limite < CURDATE()";
+
+        String sqlPrestamos =
+                "UPDATE prestamo SET estado = 'vencido' "
+                + "WHERE estado = 'activo' "
+                + "AND fecha_vencimiento_final < CURDATE()";
+
+        try (Connection con = Conexion.conectar()) {
+
+            con.setAutoCommit(false);
+
+            try (
+                PreparedStatement psCuotas =
+                        con.prepareStatement(sqlCuotas);
+                PreparedStatement psPrestamos =
+                        con.prepareStatement(sqlPrestamos)
+            ) {
+
+                psCuotas.executeUpdate();
+                psPrestamos.executeUpdate();
+
+                con.commit();
+
+            } catch (SQLException e) {
+
+                con.rollback();
+                throw e;
+            }
+
+        } catch (SQLException e) {
+
+            throw new DAOException(
+                    "No se pudieron actualizar los vencimientos.", e);
+        }
+    }
+
+    
+    
+    
+    
+    
+    
 }

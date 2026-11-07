@@ -6,16 +6,20 @@ import view.panel.MenuPanelCliente;
 import view.Mensajes;
 import controller.ControllerSolicitud;
 
+import controller.ControllerPrestamo;
+
 public class PanelCliente {
 
     private final MenuPanelCliente menu;
     private final Mensajes mensajes;
     private final ControllerSolicitud controllerSolicitud;
+    private final ControllerPrestamo controllerPrestamo;
 
     public PanelCliente(Scanner entrada) {
         menu = new MenuPanelCliente(entrada);
         mensajes = new Mensajes();
         controllerSolicitud = new ControllerSolicitud(entrada);
+        controllerPrestamo = new ControllerPrestamo();
     }
 
     public void iniciar(Cliente cliente) {
@@ -36,9 +40,7 @@ public class PanelCliente {
                     break;
 
                 case 3:
-                    mensajes.informativo(
-                            "Consultar prestamos y cuotas: funcionalidad en desarrollo."
-                    );
+                    controllerPrestamo.consultarComoCliente(cliente);
                     break;
 
                 case 4:
@@ -50,11 +52,9 @@ public class PanelCliente {
                 case 5:
                     mensajes.informativo(
                             "Realizar pago: Lo sentimos! Realizar pagos está fura de servicio en tu menú"
-                                    + "Acercáte al getsor de cobros para realizar tu pago."
+                            + "Acercáte al getsor de cobros para realizar tu pago."
                     );
                     break;
-
-                
 
                 case 6:
                     mensajes.informativo(
