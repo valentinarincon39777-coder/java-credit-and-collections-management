@@ -30,17 +30,16 @@ public class MenuPanelCobros {
                 =================================
 
                 1. Consultar clientes
-                2. Consultar prestamos
-                3. Consultar cuotas
-                4. Consultar pagos
-                5. Confirmar o rechazar pagos
-                6. Registrar pago presencial
+                2. Consultar prestamos y sus cuotas
+                3. Consultar pagos
+                4. Confirmar o rechazar pagos
+                5. Registrar pago presencial
                 0. Cerrar sesion
 
                 """);
 
         return validacion.validarEnteroRango(
-                "Seleccione una opcion: ", 0, 6
+                "Seleccione una opcion: ", 0, 5
         );
     }
     

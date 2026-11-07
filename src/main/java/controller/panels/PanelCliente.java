@@ -37,7 +37,7 @@ public class PanelCliente {
 
                 case 3:
                     mensajes.informativo(
-                            "Consultar cuotas: funcionalidad en desarrollo."
+                            "Consultar prestamos y cuotas: funcionalidad en desarrollo."
                     );
                     break;
 
@@ -49,17 +49,14 @@ public class PanelCliente {
 
                 case 5:
                     mensajes.informativo(
-                            "Realizar pago: funcionalidad en desarrollo."
+                            "Realizar pago: Lo sentimos! Realizar pagos está fura de servicio en tu menú"
+                                    + "Acercáte al getsor de cobros para realizar tu pago."
                     );
                     break;
+
+                
 
                 case 6:
-                    mensajes.informativo(
-                            "Consultar prestamos: funcionalidad en desarrollo."
-                    );
-                    break;
-
-                case 7:
                     mensajes.informativo(
                             "Por favor, comuníquese con un asesor para"
                             + " la actualización de sus datos. Gracias"

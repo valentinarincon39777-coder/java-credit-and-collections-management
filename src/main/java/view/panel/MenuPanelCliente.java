@@ -28,17 +28,16 @@ public class MenuPanelCliente {
 
                 1. Solicitar prestamo
                 2. Consultar solicitudes
-                3. Consultar cuotas
+                3. Consultar prestamos y sus cuotas
                 4. Consultar pagos
-                5. Realizar pago
-                6. Consultar prestamos
-                7. Información para actualizar datos
+                5. Realizar pagos
+                6. Información para actualizar datos
                 0. Cerrar sesion
 
                 """);
 
         return validacion.validarEnteroRango(
-                "Seleccione una opcion: ", 0, 7
+                "Seleccione una opcion: ", 0, 6
         );
     }
     

@@ -34,8 +34,8 @@ public class MenuPanelAdmin {
                 1. Gestionar empleados
                 2. Consultar clientes
                 3. Consultar perfil financiero
-                4. Consultar solicitudes
-                5. Consultar prestamos
+                4. Consultar solicitudes 
+                5. Consultar prestamos y sus cuotas
                 6. Consultar pagos
                 7. Consultar cartera
                 8. Generar reportes
