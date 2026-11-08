@@ -209,15 +209,25 @@ public class PagoDAO {
                 }
 
                 // 5. MARCAR LA CUOTA COMO PAGADA SI SE COMPLETO (si el monto pagado es igual al retsante que falta por pagar)
+                
+            
                 if (pago.getMonto().compareTo(restante) == 0) {
 
-                    try (PreparedStatement ps
-                            = con.prepareStatement(sqlCuotaPagada)) {
+                    try (PreparedStatement ps =
+                            con.prepareStatement(sqlCuotaPagada)) {
 
                         ps.setInt(1, cuotaId);
-                        ps.executeUpdate();
+
+                        if (ps.executeUpdate() != 1) {
+                            throw new SQLException(
+                                    "No se pudo completar la cuota.");
+                        }
                     }
+
+                    // ASIGNAR PUNTOS SOLO AL COMPLETAR LA CUOTA
+                    actualizarPuntosCliente(cuotaId, con);
                 }
+
 
                 // 6. ACTUALIZAR SALDO Y ESTADO DEL PRESTAMO
                 try (PreparedStatement ps
@@ -344,6 +354,75 @@ public class PagoDAO {
 
         return pagos;
     }
+    
+    
+    // ASIGNAR PUNTOS AL COMPLETAR UNA CUOTA*************************************************************
+    //reglas: 
+    //por cada ultima cuota pagada A TIEMPO, 3 puntos positivos. 
+    // por cada ultima cuota pagada con retraso, 3 puntos negativos por cada mora
+    private void actualizarPuntosCliente(
+            int cuotaId, Connection con) throws SQLException {
+
+        String sqlDatos =
+                "SELECT s.cliente_fk, "
+                + "DATEDIFF(CURDATE(), c.fecha_limite) AS dias_mora "
+                + "FROM cuota c "
+                + "JOIN prestamo p ON c.prestamo_fk = p.id "
+                + "JOIN solicitud_prestamo s ON p.solicitud_fk = s.id "
+                + "WHERE c.id = ?";
+                // datedif(fecha_actual, fecha_limite), substract
+
+        String sqlActualizar =
+                "UPDATE cliente SET "
+                + "puntos_positivos = puntos_positivos + ?, "
+                + "puntos_negativos = puntos_negativos + ? "
+                + "WHERE id = ?";
+
+        int clienteId;
+        int diasMora;
+
+        // 1. OBTENER CLIENTE Y DIAS DE MORA
+        try (PreparedStatement ps = con.prepareStatement(sqlDatos)) {
+
+            ps.setInt(1, cuotaId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (!rs.next()) {
+                    throw new SQLException(
+                            "No se encontraron datos de la cuota.");
+                }
+
+                clienteId = rs.getInt("cliente_fk");
+                diasMora = rs.getInt("dias_mora");
+            }
+        }
+
+        // 2. CALCULAR PUNTOS
+        int puntosPositivos = 0;
+        int puntosNegativos = 0;
+
+        if (diasMora <= 0) {
+            puntosPositivos = 3;
+        } else {
+            puntosNegativos = Math.multiplyExact(diasMora, 3);
+        }
+
+        // 3. ACTUALIZAR PUNTOS DEL CLIENTE
+        try (PreparedStatement ps =
+                con.prepareStatement(sqlActualizar)) {
+
+            ps.setInt(1, puntosPositivos);
+            ps.setInt(2, puntosNegativos);
+            ps.setInt(3, clienteId);
+
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException(
+                        "No se pudieron actualizar los puntos.");
+            }
+        }
+    }
+
 
 
 }
