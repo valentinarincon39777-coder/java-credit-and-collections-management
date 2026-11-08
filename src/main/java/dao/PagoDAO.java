@@ -9,6 +9,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.util.List;
+import java.util.ArrayList;
+import model.enums.EstadoPago;
+import model.enums.MetodoPago;
+
 import model.entity.Pago;
 import java.sql.Timestamp;
 
@@ -241,5 +246,104 @@ public class PagoDAO {
                     "No se pudo completar el registro del pago.", e);
         }
     }
+    
+    
+    
+    // CONSULTAR PAGOS DE UN CLIENTE*****************************************************
+    public List<Pago> listarPorCliente(int clienteId)
+            throws DAOException {
+
+        String sql = "SELECT p.* FROM pago p "
+                + "JOIN cuota c ON p.cuota_fk = c.id "
+                + "JOIN prestamo pr ON c.prestamo_fk = pr.id "
+                + "JOIN solicitud_prestamo s "
+                + "ON pr.solicitud_fk = s.id "
+                + "WHERE s.cliente_fk = ? "
+                + "AND p.estado = 'confirmado' "
+                + "ORDER BY p.fecha_confirmacion DESC, p.id DESC";
+
+        return consultarPagos(sql, clienteId);
+    }
+
+    // CONSULTAR PAGOS REGISTRADOS POR UN GESTOR*******************************************
+    public List<Pago> listarPorGestor(int gestorId)
+            throws DAOException {
+
+        String sql = "SELECT * FROM pago "
+                + "WHERE gestor_fk = ? "
+                + "AND estado = 'confirmado' "
+                + "ORDER BY fecha_confirmacion DESC, id DESC";
+
+        return consultarPagos(sql, gestorId);
+    }
+
+    // CONSULTAR TODOS LOS PAGOS CONFIRMADOS
+    public List<Pago> listarTodos() throws DAOException {
+
+        String sql = "SELECT * FROM pago "
+                + "WHERE estado = 'confirmado' "
+                + "ORDER BY fecha_confirmacion DESC, id DESC";
+
+        return consultarPagos(sql, null);
+    }
+
+    // METODO AUXILIAR PARA EJECUTAR LAS CONSULTAS (se usa para los 3 metodos anteriores)******************************************
+    private List<Pago> consultarPagos(
+            String sql, Integer filtro) throws DAOException {
+
+        List<Pago> pagos = new ArrayList<>();
+
+        try (
+                Connection con = Conexion.conectar();
+                PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+            //se pone el id, ya sea el del cliente o el del gestor. 
+            if (filtro != null) {
+                ps.setInt(1, filtro);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    java.sql.Timestamp fechaSolicitud =
+                            rs.getTimestamp("fecha_solicitud");
+
+                    java.sql.Timestamp fechaConfirmacion =
+                            rs.getTimestamp("fecha_confirmacion");
+
+                    Pago pago = new Pago(
+                            rs.getInt("id"),
+                            rs.getInt("cuota_fk"),
+                            rs.getBigDecimal("monto"),
+                            MetodoPago.valueOf(
+                                    rs.getString("metodo_pago")),
+                            fechaSolicitud == null ? null
+                                    : fechaSolicitud.toLocalDateTime(),
+                            
+                            
+                            fechaConfirmacion == null ? null
+                                    : fechaConfirmacion.toLocalDateTime(),
+                            
+                            
+                            
+                            
+                            EstadoPago.valueOf(
+                                    rs.getString("estado")),
+                            rs.getInt("gestor_fk")
+                    );
+
+                    pagos.add(pago);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudieron consultar los pagos.", e);
+        }
+
+        return pagos;
+    }
+
 
 }

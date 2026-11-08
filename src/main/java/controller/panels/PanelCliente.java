@@ -7,6 +7,7 @@ import view.Mensajes;
 import controller.ControllerSolicitud;
 
 import controller.ControllerPrestamo;
+import controller.ControllerPago;
 
 public class PanelCliente {
 
@@ -14,12 +15,14 @@ public class PanelCliente {
     private final Mensajes mensajes;
     private final ControllerSolicitud controllerSolicitud;
     private final ControllerPrestamo controllerPrestamo;
+    private final ControllerPago controllerPago;
 
     public PanelCliente(Scanner entrada) {
         menu = new MenuPanelCliente(entrada);
         mensajes = new Mensajes();
         controllerSolicitud = new ControllerSolicitud(entrada);
         controllerPrestamo = new ControllerPrestamo();
+        controllerPago = new ControllerPago(entrada);
     }
 
     public void iniciar(Cliente cliente) {
@@ -44,9 +47,7 @@ public class PanelCliente {
                     break;
 
                 case 4:
-                    mensajes.informativo(
-                            "Consultar pagos: funcionalidad en desarrollo."
-                    );
+                    controllerPago.consultarComoCliente(cliente);
                     break;
 
                 case 5:

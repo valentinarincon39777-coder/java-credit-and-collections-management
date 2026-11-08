@@ -47,9 +47,7 @@ public class PanelCobros {
                     break;
 
                 case 3:
-                    mensajes.informativo(
-                            "Consultar pagos: funcionalidad en desarrollo."
-                    );
+                    controllerPago.consultarComoGestor(empleado);
                     break;
 
                 case 4:

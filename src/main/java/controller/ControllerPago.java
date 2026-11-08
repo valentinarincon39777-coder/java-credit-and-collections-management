@@ -49,7 +49,7 @@ public class ControllerPago {
         mensajes = new Mensajes();
     }
 
-    // REGISTRAR PAGO DESDE EL PANEL DEL GESTOR
+    // REGISTRAR PAGO DESDE EL PANEL DEL GESTOR*******************************************
     public void registrarPago(Empleado gestor) {
 
         try {
@@ -201,4 +201,62 @@ public class ControllerPago {
             mensajes.error(e.getMessage());
         }
     }
+    
+    
+    
+    
+    
+    
+    
+    // CONSULTAR PAGOS DEL CLIENTE*****************************************************
+    public void consultarComoCliente(Cliente cliente) {
+
+        try {
+            mostrarHistorial(
+                    pagoDAO.listarPorCliente(cliente.getId()));
+
+        } catch (DAOException e) {
+            mensajes.error("No fue posible consultar los pagos.");
+        }
+    }
+
+    // CONSULTAR PAGOS REGISTRADOS POR EL GESTOR****************************************
+    public void consultarComoGestor(Empleado gestor) {
+
+        try {
+            mostrarHistorial(
+                    pagoDAO.listarPorGestor(gestor.getId()));
+
+        } catch (DAOException e) {
+            mensajes.error("No fue posible consultar los pagos.");
+        }
+    }
+
+    // CONSULTAR TODOS LOS PAGOS: ADMINISTRADOR**********************************
+    public void consultarTodos() {
+
+        try {
+            mostrarHistorial(pagoDAO.listarTodos());
+
+        } catch (DAOException e) {
+            mensajes.error("No fue posible consultar los pagos.");
+        }
+    }
+
+    // METODO AUXILIAR PARA MOSTRAR LOS RESULTADOS de los 3 métodos de arriba **********************************************
+    private void mostrarHistorial(List<Pago> pagos) {
+
+        if (pagos.isEmpty()) {
+            mensajes.informativo(
+                    "No se encontraron pagos registrados.");
+            return;
+        }
+
+        vista.mostrarPagos(pagos);
+    }
+
+    
+    
+    
+    
 }

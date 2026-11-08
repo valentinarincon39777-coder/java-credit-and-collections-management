@@ -6,6 +6,7 @@ import java.util.List;
 import model.entity.Cliente;
 import model.entity.Prestamo;
 import model.entity.Cuota;
+import model.entity.Pago;
 
 public class VistaPago {
 
@@ -75,4 +76,48 @@ public class VistaPago {
         System.out.println("Metodo: " + metodo);
         System.out.println("------------------------------------");
     }
+    
+    
+    
+    // MOSTRAR HISTORIAL DE PAGOS**************************
+    public void mostrarPagos(List<Pago> pagos) {
+
+        System.out.println("\n========== HISTORIAL DE PAGOS ==========");
+
+        for (Pago pago : pagos) {
+
+            System.out.println("+" + "=".repeat(55) + "+");
+
+            System.out.printf("| %-53s |%n",
+                    "PAGO #" + pago.getId());
+
+            System.out.println("+" + "-".repeat(55) + "+");
+
+            System.out.printf("| %-53s |%n",
+                    "Cuota ID: " + pago.getCuotaId());
+
+            System.out.printf("| %-53s |%n",
+                    "Monto pagado: $" + pago.getMonto());
+
+            System.out.printf("| %-53s |%n",
+                    "Metodo: " + pago.getMetodoPago());
+
+            System.out.printf("| %-53s |%n",
+                    "Fecha: " + pago.getFechaConfirmacion());
+
+            System.out.printf("| %-53s |%n",
+                    "Estado: " + pago.getEstado());
+
+            System.out.printf("| %-53s |%n",
+                    "Gestor ID: " + pago.getGestorId());
+
+            System.out.println("+" + "=".repeat(55) + "+");
+            System.out.println();
+        }
+    }
+
+    
+    
+    
+    
 }
