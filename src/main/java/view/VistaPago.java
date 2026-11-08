@@ -9,7 +9,7 @@ import model.entity.Cuota;
 
 public class VistaPago {
 
-    // MOSTRAR EL PRESTAMO Y SUS CUOTAS
+    // MOSTRAR EL PRESTAMO Y SUS CUOTAS**********************************
     public void mostrarPrestamo(
             Cliente cliente, Prestamo prestamo,
             List<Cuota> cuotas) {
@@ -35,7 +35,7 @@ public class VistaPago {
         System.out.println("------------------------------------");
     }
 
-    // MOSTRAR LA CUOTA QUE OBLIGATORIAMENTE SE DEBE PAGAR
+    // MOSTRAR LA CUOTA QUE OBLIGATORIAMENTE SE DEBE PAGAR***************************
     public void mostrarCuotaAPagar(
             Cuota cuota, BigDecimal totalAbonado) {
 
@@ -57,7 +57,7 @@ public class VistaPago {
         System.out.println("------------------------------------");
     }
 
-    // MOSTRAR METODOS DE PAGO
+    // MOSTRAR METODOS DE PAGO************************************
     public void mostrarMetodosPago() {
 
         System.out.println("\nMETODO DE PAGO");
@@ -66,7 +66,7 @@ public class VistaPago {
         System.out.println("3. Yappy");
     }
 
-    // MOSTRAR RESUMEN ANTES DE CONFIRMAR
+    // MOSTRAR RESUMEN ANTES DE CONFIRMAR**********************************
     public void mostrarResumen(
             BigDecimal monto, String metodo) {
 

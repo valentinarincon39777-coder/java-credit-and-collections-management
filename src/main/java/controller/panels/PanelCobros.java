@@ -8,18 +8,22 @@ import controller.ControllerCliente;
 
 import controller.ControllerPrestamo;
 
+import controller.ControllerPago;
+
 public class PanelCobros {
 
     private final MenuPanelCobros menu;
     private final Mensajes mensajes;
     private final ControllerCliente controllerCliente;
     private final ControllerPrestamo controllerPrestamo;
+    private final ControllerPago controllerPago;
 
     public PanelCobros(Scanner entrada) {
         menu = new MenuPanelCobros(entrada);
         mensajes = new Mensajes();
         controllerCliente = new ControllerCliente(entrada);
         controllerPrestamo = new ControllerPrestamo(entrada);
+        controllerPago = new ControllerPago(entrada);
 
     }
 
@@ -50,14 +54,12 @@ public class PanelCobros {
 
                 case 4:
                     mensajes.informativo(
-                            "Confirmar o rechazar pagos: funcionalidad en desarrollo."
+                            "Función deshabilitada temporalmente"
                     );
                     break;
 
                 case 5:
-                    mensajes.informativo(
-                            "Registrar pago presencial: funcionalidad en desarrollo."
-                    );
+                    controllerPago.registrarPago(empleado);
                     break;
 
                 case 0:
