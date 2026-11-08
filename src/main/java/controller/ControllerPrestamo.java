@@ -18,6 +18,9 @@ import dao.ClienteDAO;
 import java.util.Scanner;
 import utils.Validacion;
 
+
+import java.util.Map;
+
 public class ControllerPrestamo {
 
     private final PrestamoDAO prestamoDAO;
@@ -158,6 +161,31 @@ private Validacion validacion;
             vista.mostrarPrestamoConCuotas(prestamo, cuotas);
         }
     }
+    
+    
+    
+    // CONSULTAR CARTERA GENERAL DEL ADMINISTRADOR****************************
+    public void consultarCartera() {
+
+        try {
+
+            // ACTUALIZAR LOS ESTADOS ANTES DE CONSULTAR
+            prestamoDAO.actualizarVencimientos();
+
+            // OBTENER LOS DATOS FINANCIEROS DE LA CARTERA
+            Map<String, Number> cartera =
+                    prestamoDAO.consultarCartera();
+
+            // ENVIAR LOS DATOS A LA VISTA
+            vista.mostrarCartera(cartera);
+
+        } catch (DAOException e) {
+
+            mensajes.error(
+                    "No fue posible consultar la cartera.");
+        }
+    }
+
 
     
     

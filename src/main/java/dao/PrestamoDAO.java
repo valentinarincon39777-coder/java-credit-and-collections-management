@@ -17,6 +17,11 @@ import java.util.List;
 import model.entity.Prestamo;
 import model.enums.EstadoPrestamo;
 
+
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 public class PrestamoDAO {
 
     // INSERTAR PRESTAMO CON CONEXION COMPARTIDA DE SOLICITUD******************************************
@@ -242,6 +247,63 @@ public class PrestamoDAO {
 
         return prestamos;
     }
+    
+    
+    
+    // CONSULTAR RESUMEN GENERAL DE LA CARTERA*********************************++++
+    public Map<String, Number> consultarCartera()
+            throws DAOException {
+
+        String sql =
+                "SELECT "
+                + "COUNT(*) AS total_prestamos, "
+                + "COALESCE(SUM(total_pagar), 0) AS total_cobrar, "
+                + "COALESCE(SUM(saldo_pendiente), 0) AS saldo_pendiente, "
+                + "(SELECT COALESCE(SUM(monto), 0) "
+                + "FROM pago WHERE estado = 'confirmado') AS total_recaudado, "
+                + "COUNT(CASE WHEN estado = 'activo' THEN 1 END) AS activos, "
+                + "COUNT(CASE WHEN estado = 'vencido' THEN 1 END) AS vencidos, "
+                + "COUNT(CASE WHEN estado = 'pagado' THEN 1 END) AS pagados "
+                + "FROM prestamo";
+
+        Map<String, Number> cartera = new LinkedHashMap<>();
+
+        try (
+                Connection con = Conexion.conectar();
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+        ) {
+
+            if (rs.next()) {
+
+                cartera.put("totalPrestamos",
+                        rs.getInt("total_prestamos"));
+
+                cartera.put("totalCobrar",
+                        
+                        //suma de los montos totales de todos los préstamos, incluyendo intereses.
+                        
+                        rs.getBigDecimal("total_cobrar"));
+
+                cartera.put("totalRecaudado",
+                        rs.getBigDecimal("total_recaudado"));
+
+                cartera.put("saldoPendiente",
+                        rs.getBigDecimal("saldo_pendiente"));
+
+                cartera.put("activos", rs.getInt("activos"));
+                cartera.put("vencidos", rs.getInt("vencidos"));
+                cartera.put("pagados", rs.getInt("pagados"));
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "No se pudo consultar la cartera.", e);
+        }
+
+        return cartera;
+    }
+
 
 
     

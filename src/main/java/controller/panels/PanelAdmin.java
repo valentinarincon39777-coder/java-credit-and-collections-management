@@ -67,9 +67,7 @@ public class PanelAdmin {
                     break;
 
                 case 7:
-                    mensajes.informativo(
-                            "Consultar cartera: funcionalidad en desarrollo."
-                    );
+                    controllerPrestamo.consultarCartera();
                     break;
 
                 case 8:

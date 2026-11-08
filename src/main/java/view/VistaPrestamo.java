@@ -2,6 +2,7 @@
 package view;
 
 import java.util.List;
+import java.util.Map;
 import model.entity.Prestamo;
 import model.entity.Cuota;
 
@@ -75,5 +76,52 @@ public class VistaPrestamo {
     System.out.println("3. Ver prestamos vencidos");
     System.out.println("0. Volver");
 }
+    
+    
+    // MOSTRAR RESUMEN FINANCIERO DE LA CARTERA******************************************
+    public void mostrarCartera(Map<String, Number> cartera) {
+
+        System.out.println();
+        System.out.println("+" + "=".repeat(66) + "+");
+
+        imprimirLinea("CARTERA DE CREDITOS - CREDIYA");
+
+        System.out.println("+" + "=".repeat(66) + "+");
+
+        imprimirLinea("Total de prestamos otorgados: "
+                + cartera.get("totalPrestamos"));
+
+        imprimirLinea("Total a cobrar: $"
+                + cartera.get("totalCobrar"));
+
+        imprimirLinea("Total recaudado: $"
+                + cartera.get("totalRecaudado"));
+
+        imprimirLinea("Saldo total pendiente: $"
+                + cartera.get("saldoPendiente"));
+
+        System.out.println("+" + "-".repeat(66) + "+");
+
+        imprimirLinea("ESTADO DE LOS PRESTAMOS");
+
+        System.out.println("+" + "-".repeat(66) + "+");
+
+        imprimirLinea("Prestamos activos: "
+                + cartera.get("activos"));
+
+        imprimirLinea("Prestamos vencidos: "
+                + cartera.get("vencidos"));
+
+        imprimirLinea("Prestamos pagados: "
+                + cartera.get("pagados"));
+
+        System.out.println("+" + "=".repeat(66) + "+");
+        System.out.println();
+    }
+
+    
+    
+    
+    
     
 }
