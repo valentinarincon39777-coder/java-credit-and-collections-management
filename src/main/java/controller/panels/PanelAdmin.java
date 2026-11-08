@@ -9,6 +9,7 @@ import controller.ControllerCliente;
 import controller.ControllerSolicitud;
 import controller.ControllerPrestamo;
 import controller.ControllerPago;
+import controller.ControllerReporte;
 
 public class PanelAdmin {
 
@@ -19,6 +20,7 @@ public class PanelAdmin {
     private final ControllerSolicitud controllerSolicitud;
     private final ControllerPrestamo controllerPrestamo;
     private final ControllerPago controllerPago;
+    private final ControllerReporte controllerReporte;
 
     public PanelAdmin(Scanner entrada) {
         menu = new MenuPanelAdmin(entrada);
@@ -28,6 +30,7 @@ public class PanelAdmin {
         controllerSolicitud = new ControllerSolicitud(entrada);
         controllerPrestamo = new ControllerPrestamo(entrada);
         controllerPago = new ControllerPago(entrada);
+        controllerReporte = new ControllerReporte();
     }
 
     public void iniciar(Empleado empleado) {
@@ -71,9 +74,7 @@ public class PanelAdmin {
                     break;
 
                 case 8:
-                    mensajes.informativo(
-                            "Generar reportes: funcionalidad en desarrollo."
-                    );
+                    controllerReporte.generarReporteGeneral();
                     break;
 
                 case 9:
