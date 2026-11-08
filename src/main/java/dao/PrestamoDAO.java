@@ -303,6 +303,11 @@ public class PrestamoDAO {
 
         return cartera;
     }
+    
+    
+    
+    
+    
 
 
 

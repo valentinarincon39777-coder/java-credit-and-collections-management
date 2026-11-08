@@ -15,6 +15,12 @@ import model.entity.Cliente;
 import java.util.List;
 import java.util.ArrayList;
 
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+
+
 public class ClienteDAO {
 
     // BUSCAR CLIENTE POR DOCUMENTO*******************************************
@@ -250,6 +256,72 @@ public class ClienteDAO {
 
         return clientes;
     }
+    
+    
+    
+    
+    
+    
+    // CONSULTAR CLIENTES CON CUOTAS VENCIDAS (MOROSOS)*******************************************
+    //este metodo se usará para los reportes
+    //un cliente puede ser moroso aunque una prestamo siga activo, en lugar de vencido, siempre y cuando al menos una de sus cuotas esten vencidas
+    //de igual forma recordar que un prestamo solo esta vencido cuando todas sus cuotas han vencido
+    
+    public Map<Cliente, Integer> listarClientesMorosos()
+            throws DAOException {
+
+        String sql = "SELECT p.*, c.salario_formal, "
+                + "c.puntos_positivos, c.puntos_negativos, "
+                + "m.cuotas_vencidas "
+                + "FROM persona p "
+                + "JOIN cliente c ON p.id = c.id "
+                + "JOIN ( "
+                + "SELECT s.cliente_fk, COUNT(*) AS cuotas_vencidas "
+                + "FROM cuota cu "
+                + "JOIN prestamo pr ON cu.prestamo_fk = pr.id "
+                + "JOIN solicitud_prestamo s "
+                + "ON pr.solicitud_fk = s.id "
+                + "WHERE cu.estado = 'vencida' " //filtro
+                + "GROUP BY s.cliente_fk "
+                + ") m ON m.cliente_fk = c.id "
+                + "ORDER BY m.cuotas_vencidas DESC, p.nombre";
+
+        Map<Cliente, Integer> morosos = new LinkedHashMap<>();
+
+        try (
+                Connection con = Conexion.conectar();
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+
+                Cliente cliente = construirCliente(rs);
+
+                int cuotasVencidas =
+                        rs.getInt("cuotas_vencidas");
+
+                morosos.put(cliente, cuotasVencidas);
+                
+                //cuotasVencidas= cantidad de cuotas vencidas de dicho cliente
+            }
+
+        } catch (SQLException e) {
+
+            throw new DAOException(
+                    "No se pudieron consultar los clientes morosos.", e);
+        }
+
+        return morosos;
+    }
+
+
+
+    
+    
+    
+    
+    
 
     // CONVERTIR UNA FILA SQL EN UN OBJETO CLIENTE****************************
     private Cliente construirCliente(ResultSet rs)
@@ -269,7 +341,7 @@ public class ClienteDAO {
     }
     
     
-    // ACTUALIZAR DATOS PERSONALES********************************************
+    // ACTUALIZAR DATOS PERSONALES*************************************************************
     public boolean actualizarDatoPersonal(
             int id, int campo, String valor)
             throws DAOException {
@@ -319,7 +391,12 @@ public class ClienteDAO {
     
     
     
-    // ACTUALIZAR SALARIO FORMAL*****************************************************
+    
+    
+    
+    
+    
+    // ACTUALIZAR SALARIO FORMAL***********************************************************************************
     public boolean actualizarSalario(
             int id, BigDecimal salario)
             throws DAOException {
@@ -462,8 +539,9 @@ public class ClienteDAO {
                     "Error de base de datos al eliminar.", e);
         }
     }
-
-
+    
+    
+    
     
 
 }
