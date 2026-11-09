@@ -1,0 +1,180 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema CrediYa
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema CrediYa
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `CrediYa` DEFAULT CHARACTER SET utf8 ;
+USE `CrediYa` ;
+
+-- -----------------------------------------------------
+-- Table `CrediYa`.`persona`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `CrediYa`.`persona` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  `documento` VARCHAR(35) NOT NULL,
+  `correo` VARCHAR(45) NOT NULL,
+  `telefono` VARCHAR(30) NOT NULL,
+  `direccion` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `documento_UNIQUE` (`documento` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `CrediYa`.`cliente`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `CrediYa`.`cliente` (
+  `id` INT NOT NULL,
+  `salario_formal` DECIMAL(10,2) NOT NULL,
+  `puntos_positivos` INT NOT NULL DEFAULT 0,
+  `puntos_negativos` INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `cliente_fk_1`
+    FOREIGN KEY (`id`)
+    REFERENCES `CrediYa`.`persona` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `CrediYa`.`empleado`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `CrediYa`.`empleado` (
+  `id` INT NOT NULL,
+  `rol` ENUM('administrador_general', 'asesor_creditos', 'analista_creditos', 'gestor_cobros') NOT NULL,
+  `estado` ENUM('activo', 'inactivo') NOT NULL DEFAULT 'activo',
+  PRIMARY KEY (`id`),
+  CONSTRAINT `empleado_fk_1`
+    FOREIGN KEY (`id`)
+    REFERENCES `CrediYa`.`persona` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `CrediYa`.`solicitud_prestamo`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `CrediYa`.`solicitud_prestamo` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `cliente_fk` INT NOT NULL,
+  `asesor_fk` INT NULL,
+  `analista_fk` INT NULL,
+  `monto_solicitado` DECIMAL(12,2) NOT NULL,
+  `cantidad_cuotas` INT NOT NULL,
+  `estado_solicitud` ENUM('pendiente', 'aceptado', 'denegado') NOT NULL DEFAULT 'pendiente',
+  `fecha_solicitud` DATETIME NOT NULL,
+  `fecha_evaluacion` DATETIME NULL,
+  `motivo_rechazo` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `solicitud_prestamo_fk_1_idx` (`cliente_fk` ASC) VISIBLE,
+  INDEX `solicitud_prestamo_fk_2_idx` (`asesor_fk` ASC) VISIBLE,
+  INDEX `solicitud_prestamo_fk_3_idx` (`analista_fk` ASC) VISIBLE,
+  CONSTRAINT `solicitud_prestamo_fk_1`
+    FOREIGN KEY (`cliente_fk`)
+    REFERENCES `CrediYa`.`cliente` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `solicitud_prestamo_fk_2`
+    FOREIGN KEY (`asesor_fk`)
+    REFERENCES `CrediYa`.`empleado` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `solicitud_prestamo_fk_3`
+    FOREIGN KEY (`analista_fk`)
+    REFERENCES `CrediYa`.`empleado` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `CrediYa`.`prestamo`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `CrediYa`.`prestamo` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `solicitud_fk` INT NOT NULL,
+  `interes` DECIMAL(5,2) NOT NULL,
+  `total_pagar` DECIMAL(12,2) NOT NULL,
+  `saldo_pendiente` DECIMAL(12,2) NOT NULL,
+  `fecha_desembolso` DATETIME NOT NULL,
+  `fecha_vencimiento_final` DATE NOT NULL,
+  `estado` ENUM('activo', 'vencido', 'pagado') NOT NULL DEFAULT 'activo',
+  PRIMARY KEY (`id`),
+  INDEX `prestamo_fk_1_idx` (`solicitud_fk` ASC) VISIBLE,
+  UNIQUE INDEX `solicitud_fk_UNIQUE` (`solicitud_fk` ASC) VISIBLE,
+  CONSTRAINT `prestamo_fk_1`
+    FOREIGN KEY (`solicitud_fk`)
+    REFERENCES `CrediYa`.`solicitud_prestamo` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `CrediYa`.`cuota`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `CrediYa`.`cuota` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `prestamo_fk` INT NOT NULL,
+  `numero_cuota` INT NOT NULL,
+  `fecha_limite` DATE NOT NULL,
+  `capital` DECIMAL(10,2) NOT NULL,
+  `interes` DECIMAL(10,2) NOT NULL,
+  `monto_pagar` DECIMAL(10,2) NOT NULL,
+  `estado` ENUM('pendiente', 'vencida', 'pagada') NOT NULL DEFAULT 'pendiente',
+  PRIMARY KEY (`id`),
+  INDEX `cuota_fk_1_idx` (`prestamo_fk` ASC) VISIBLE,
+  CONSTRAINT `cuota_fk_1`
+    FOREIGN KEY (`prestamo_fk`)
+    REFERENCES `CrediYa`.`prestamo` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `CrediYa`.`pago`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `CrediYa`.`pago` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `cuota_fk` INT NOT NULL,
+  `monto` DECIMAL(10,2) NOT NULL,
+  `metodo_pago` ENUM('efectivo', 'tarjeta', 'yappy') NOT NULL,
+  `fecha_solicitud` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_confirmacion` DATETIME NULL,
+  `estado` ENUM('pendiente_confirmacion', 'confirmado', 'rechazado') NOT NULL DEFAULT 'pendiente_confirmacion',
+  `gestor_fk` INT NULL,
+  `motivo_rechazo` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `pago_fk_1_idx` (`cuota_fk` ASC) VISIBLE,
+  INDEX `pago_fk_2_idx` (`gestor_fk` ASC) VISIBLE,
+  CONSTRAINT `pago_fk_1`
+    FOREIGN KEY (`cuota_fk`)
+    REFERENCES `CrediYa`.`cuota` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `pago_fk_2`
+    FOREIGN KEY (`gestor_fk`)
+    REFERENCES `CrediYa`.`empleado` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+USE `CrediYa` ;
+
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

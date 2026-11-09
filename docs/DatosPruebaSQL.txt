@@ -1,0 +1,32 @@
+
+USE CrediYa;
+
+START TRANSACTION;
+
+-- 1. REGISTRAR PERSONAS
+INSERT INTO persona
+(id, nombre, documento, correo, telefono, direccion)
+VALUES
+(1, 'Carlos Mendoza', '8-111', 'carlos@crediya.com', '6000-1111', 'Panama'),
+(2, 'Laura Gomez', '8-222', 'laura@crediya.com', '6000-2222', 'Panama'),
+(3, 'Andres Rodriguez', '8-333', 'andres@crediya.com', '6000-3333', 'Panama'),
+(4, 'Sofia Martinez', '8-444', 'sofia@crediya.com', '6000-4444', 'Panama'),
+(5, 'Valentina Perez', '8-555', 'valentina@example.com', '6000-5555', 'Panama'),
+(6, 'Daniel Castillo', '8-666', 'daniel@example.com', '6000-6666', 'Panama');
+
+-- 2. REGISTRAR EMPLEADOS
+INSERT INTO empleado (id, rol, estado)
+VALUES
+(1, 'administrador_general', 'activo'),
+(2, 'asesor_creditos', 'activo'),
+(3, 'analista_creditos', 'activo'),
+(4, 'gestor_cobros', 'activo');
+
+-- 3. REGISTRAR CLIENTES
+INSERT INTO cliente
+(id, salario_formal, puntos_positivos, puntos_negativos)
+VALUES
+(5, 1800.00, 0, 0),
+(6, 1200.00, 0, 0);
+
+COMMIT;
