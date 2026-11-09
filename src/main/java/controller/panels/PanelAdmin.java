@@ -53,7 +53,7 @@ public class PanelAdmin {
 
                 case 3:
                     mensajes.informativo(
-                            "Consultar perfil financiero: funcionalidad inactiva por el momento"
+                            "Funcionalidad inactiva por el momento"
                     );
                     break;
 
@@ -78,9 +78,7 @@ public class PanelAdmin {
                     break;
 
                 case 9:
-                    mensajes.informativo(
-                            "Exportaciones y backups: funcionalidad en desarrollo."
-                    );
+                    controllerReporte.exportarReporte();
                     break;
 
                 case 0:

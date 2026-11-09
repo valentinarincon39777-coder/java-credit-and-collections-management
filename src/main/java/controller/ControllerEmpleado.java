@@ -43,7 +43,7 @@ public class ControllerEmpleado {
         try {
             if (empleadoDAO.existeDocumento(empleado.getDocumento())) {
 
-                mensajes.error("Ya existe una persona con esa cédula");
+                mensajes.error("Ya existe una persona con esa cedula");
                 return;
             }
 
