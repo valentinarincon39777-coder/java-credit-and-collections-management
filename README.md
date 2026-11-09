@@ -231,7 +231,7 @@ Abre [`src/main/java/database/Conexion.java`](src/main/java/database/Conexion.ja
 - **Usuario:** tu usuario local de MySQL (por ejemplo, `root`).
 - **Contraseña:** la contraseña correspondiente a ese usuario.
 
-La aplicación necesita que esos datos coincidan con los de MySQL Server. No compartas contraseñas reales en repositorios públicos.
+La aplicación necesita que esos datos coincidan con los de MySQL Server. 
 
 ### Paso 5. Abrir el proyecto
 
