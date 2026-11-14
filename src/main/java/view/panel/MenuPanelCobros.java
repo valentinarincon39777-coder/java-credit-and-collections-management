@@ -34,14 +34,26 @@ public class MenuPanelCobros {
                 3. Consultar pagos
                 4. Confirmar o rechazar pagos
                 5. Registrar pago presencial
+                6. EXAMEN JAVA
                 0. Cerrar sesion
 
                 """);
 
         return validacion.validarEnteroRango(
-                "Seleccione una opcion: ", 0, 5
+                "Seleccione una opcion: ", 0, 6
         );
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     

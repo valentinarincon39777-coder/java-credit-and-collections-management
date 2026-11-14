@@ -9,6 +9,10 @@ import controller.ControllerCliente;
 import controller.ControllerPrestamo;
 
 import controller.ControllerPago;
+import utils.Validacion; 
+
+
+
 
 public class PanelCobros {
 
@@ -17,6 +21,7 @@ public class PanelCobros {
     private final ControllerCliente controllerCliente;
     private final ControllerPrestamo controllerPrestamo;
     private final ControllerPago controllerPago;
+    private final Validacion validacion; 
 
     public PanelCobros(Scanner entrada) {
         menu = new MenuPanelCobros(entrada);
@@ -24,6 +29,7 @@ public class PanelCobros {
         controllerCliente = new ControllerCliente(entrada);
         controllerPrestamo = new ControllerPrestamo(entrada);
         controllerPago = new ControllerPago(entrada);
+        validacion= new Validacion(entrada);
 
     }
 
@@ -59,6 +65,12 @@ public class PanelCobros {
                 case 5:
                     controllerPago.registrarPago(empleado);
                     break;
+                    
+                    case 6:
+                    menuExamen(empleado);
+                    break;
+                    
+                    
 
                 case 0:
                     mensajes.informativo("Sesion cerrada correctamente.");
@@ -66,5 +78,62 @@ public class PanelCobros {
             }
 
         } while (opcion != 0);
+        
+        
+        
+        
+        
+        
     }
+    
+    
+    private void menuExamen(Empleado empleado){
+    int opcion;
+    
+    do{
+    
+        System.out.println("""
+                           ---EXAMEN JAVA ----
+                           1)REGISTRAR PAGO
+                           2)MOSTRAR HISTORIAL PAGOS
+                           0)VOLVER 
+                           
+                           """);
+        
+        opcion= validacion.validarEnteroRango("SELECCIONE OPCION", 
+                
+                0, 2);
+        
+        
+        switch(opcion){
+        
+            case 1:  controllerPago.registrarPago(empleado);
+                
+                break; 
+                                        //nuevo metodo especifico para examen
+                case 2:  controllerPago.consultarUltimoMesComoGestor(empleado);
+                
+                break; 
+                
+                
+                case 0:  mensajes.informativo("Volviendo al panel de cobros");
+                
+                break; 
+        
+        
+        
+        }
+        
+    
+    
+    }while(opcion !=0); 
+    
+    
+    
+    
+    
+    
+    }
+    
+    
 }

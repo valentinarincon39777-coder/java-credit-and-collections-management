@@ -1,4 +1,3 @@
-
 package controller;
 
 import dao.ClienteDAO;
@@ -11,6 +10,7 @@ import exception.DAOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
+import static java.util.stream.Collectors.toList;
 
 import model.entity.Cliente;
 import model.entity.Empleado;
@@ -58,8 +58,8 @@ public class ControllerPago {
             String documento = validacion.validarDocumento(
                     "Ingrese la cedula del cliente:");
 
-            Cliente cliente =
-                    clienteDAO.buscarPorDocumento(documento);
+            Cliente cliente
+                    = clienteDAO.buscarPorDocumento(documento);
 
             if (cliente == null) {
                 mensajes.error("Cliente no encontrado.");
@@ -69,8 +69,8 @@ public class ControllerPago {
             // 2. BUSCAR PRESTAMO ACTIVO O VENCIDO
             prestamoDAO.actualizarVencimientos();
 
-            List<Prestamo> prestamos =
-                    prestamoDAO.listarPorCliente(cliente.getId());
+            List<Prestamo> prestamos
+                    = prestamoDAO.listarPorCliente(cliente.getId());
 
             Prestamo prestamo = null;
 
@@ -91,14 +91,14 @@ public class ControllerPago {
             }
 
             // 3. CONSULTAR Y MOSTRAR LAS CUOTAS
-            List<Cuota> cuotas =
-                    cuotaDAO.listarPorPrestamo(prestamo.getId());
+            List<Cuota> cuotas
+                    = cuotaDAO.listarPorPrestamo(prestamo.getId());
 
             vista.mostrarPrestamo(cliente, prestamo, cuotas);
 
             // 4. IDENTIFICAR LA CUOTA MAS ANTIGUA SIN PAGAR
             Cuota cuotaAPagar = null;
-            
+
             //lista de las cuotas del prestamo vencido o activo
             for (Cuota cuota : cuotas) {
 
@@ -120,13 +120,13 @@ public class ControllerPago {
             }
 
             // 5. CALCULAR ABONOS ANTERIORES
-            BigDecimal totalAbonado =
-                    pagoDAO.calcularTotalAbonado(
+            BigDecimal totalAbonado
+                    = pagoDAO.calcularTotalAbonado(
                             cuotaAPagar.getId());
 
             //se retsa del monto total de la cuota, lo abonado, para saber uqe face falta pagar
-            BigDecimal restante =
-                    cuotaAPagar.getMontoPagar()
+            BigDecimal restante
+                    = cuotaAPagar.getMontoPagar()
                             .subtract(totalAbonado);
 
             vista.mostrarCuotaAPagar(
@@ -201,13 +201,7 @@ public class ControllerPago {
             mensajes.error(e.getMessage());
         }
     }
-    
-    
-    
-    
-    
-    
-    
+
     // CONSULTAR PAGOS DEL CLIENTE*****************************************************
     public void consultarComoCliente(Cliente cliente) {
 
@@ -255,8 +249,23 @@ public class ControllerPago {
         vista.mostrarPagos(pagos);
     }
 
-    
-    
-    
-    
+    //METODO ESPECIAL PARA EL EXAMEN  de consultar pagos con stream API ***************************************
+    public void consultarUltimoMesComoGestor(Empleado gestor) {
+
+        try {
+
+            List<Pago> pagos = pagoDAO.listarPorGestor(gestor.getId());
+
+            List<Pago> pagosOrdenados = pagos.stream()
+           .toList();
+            
+            mostrarHistorial(pagosOrdenados);
+
+        } catch (DAOException e) {
+
+            mensajes.error("NO FUE POSIBLE CONSULTAR LOS PAGOS ");
+        }
+
+    }
+
 }
